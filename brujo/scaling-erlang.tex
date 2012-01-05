@@ -1,0 +1,136 @@
+\documentclass[utf8]{beamer}
+\mode<presentation>
+\usepackage{listings}
+\usepackage{helvet}
+\usetheme{Warsaw}
+\usecolortheme{whale}
+\usefonttheme[onlylarge]{structuresmallcapsserif}
+\usefonttheme[onlysmall]{structurebold}
+
+\begin{document}
+\title{Scaling Erlang Web Applications}
+\subtitle{How we went from 100 to 100K users}
+\author{Fernando Benavides (\textit{@elbrujohalcon})}
+\institute{Inaka Labs}
+\date{\today}
+
+\frame{\titlepage} 
+
+\begin{frame}
+	\frametitle{Who am I?}
+	TODO: My info
+\end{frame}
+
+\begin{frame}
+	\frametitle{About Inaka}
+	TODO: Inaka's Info
+\end{frame}
+
+\frame{\frametitle{Outline}\tableofcontents[pausesections]} 
+
+\section{Introduction}
+\begin{frame}{The Sample Project}{Match Stream}
+	\begin{itemize}
+		\item TODO: Brief description
+		\item TODO: Why I choose \alert{this} project
+	\end{itemize}
+\end{frame}
+\begin{frame}{The Challenge}
+	\begin{itemize}
+		\item TODO: Initial project situation (i.e. 100 users)
+		\item TODO: Project objectives (i.e. 100K users)
+	\end{itemize}
+\end{frame}
+
+\section{The Plan}
+\subsection{Is it really working?}
+\begin{frame}{Goals}
+	TODO: this stage goals
+\end{frame}
+\begin{frame}{Steps}
+	TODO: this stage steps
+\end{frame}
+\begin{frame}{Results}{on Match Stream}
+	TODO: describe this stage results
+\end{frame}
+
+\subsection{Finding The Boundaries}
+\begin{frame}{Goals}
+	TODO: this stage goals
+\end{frame}
+\begin{frame}{Steps}
+	TODO: this stage steps
+\end{frame}
+\begin{frame}{Results}{on Match Stream}
+	TODO: describe this stage results
+\end{frame}
+
+\subsection{Blackbox Tests}
+\begin{frame}{Goals}
+	TODO: this stage goals
+\end{frame}
+\begin{frame}{Steps}
+	TODO: this stage steps
+\end{frame}
+\begin{frame}{Results}{on Match Stream}
+	TODO: describe this stage results
+\end{frame}
+
+\subsection{Erlang Tuning}
+\begin{frame}{Goals}
+	TODO: this stage goals
+\end{frame}
+\begin{frame}{Steps}
+	TODO: this stage steps
+\end{frame}
+\begin{frame}{Tips and Tricks}
+	TODO: describe this stage results
+\end{frame}
+\begin{frame}{Results}{on Match Stream}
+	TODO: describe this stage results
+\end{frame}
+
+\subsection{Adding Nodes}
+\begin{frame}{Goals}
+	TODO: this stage goals
+\end{frame}
+\begin{frame}{Steps}
+	TODO: this stage steps
+\end{frame}
+\begin{frame}{Results}{on Match Stream}
+	TODO: describe this stage results
+\end{frame}
+
+\section{Final Words}
+\subsection{Summary}
+\begin{frame}{Summary}
+	TODO: Summary
+\end{frame}
+\subsection{Other stuff}
+\begin{frame}{Other stuff}{that we left out of this presentation}
+	TODO: List of other scalability stuff we left out
+\end{frame}
+\subsection{Questions}
+\begin{frame}
+	\alert{Any questions?}
+\end{frame}
+
+\appendix
+
+\lstset{language=erlang}
+\defverbatim[colored]\mycode{%
+\begin{lstlisting}[frame=single, emph={fact}, emphstyle={\color{blue}}]
+-spec fact(integer()) -> integer().
+fact(N) ->
+	lists:fold(fun(X, F) ->
+			F * X
+		   end, 1, lists:seq(1,N)).
+\end{lstlisting}
+}
+
+\section{Some Code}
+\begin{frame}
+\mycode
+\end{frame}
+
+\end{document}
