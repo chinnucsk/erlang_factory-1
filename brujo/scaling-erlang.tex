@@ -7,9 +7,11 @@
 \usefonttheme[onlylarge]{structuresmallcapsserif}
 \usefonttheme[onlysmall]{structurebold}
 
+\setbeameroption{show notes}
+
 \begin{document}
 \title{Scaling Erlang Web Applications}
-\subtitle{How we went from 100 to 100K users}
+\subtitle{100 to 100K users at one web server}
 \author{Fernando Benavides (\textit{@elbrujohalcon})}
 \institute{Inaka Labs}
 \date{\today}
@@ -18,27 +20,47 @@
 
 \begin{frame}
 	\frametitle{Who am I?}
-	TODO: My info
+	TODO: some funny stuff about Argentina, me, Erlang, elbrujohalcon... maybe some pictures
+	\note{Brief review of my story, why am I an Erlang programmer, how much I know about web applications and scalability}
 \end{frame}
 
 \begin{frame}
 	\frametitle{About Inaka}
 	TODO: Inaka's Info
+	\note{Brief review of Inaka's story, the systems we develop and why scalability matters to us}
 \end{frame}
 
 \frame{\frametitle{Outline}\tableofcontents[pausesections]} 
 
-\section{Introduction}
-\begin{frame}{The Sample Project}{Match Stream}
+\section{The Challenge}
+\subsection{Description}
+\begin{frame}
+	We will work on the scalability of a \emph{web} project \pause that has a \emph{HTTP API} \pause and keeps clients \emph{connected} to the server \pause for \emph{long periods} of time.
+\end{frame}
+\begin{frame}
+	We will work on the scalability of a \emph{web} project that has a \emph{HTTP API} and keeps clients \emph{connected} to the server for \emph{long periods} of time.
+	For example:
 	\begin{itemize}
-		\item TODO: Brief description
-		\item TODO: Why I choose \alert{this} project
+		\item Social sites
+		\item Chat sites
+		\item Sports sites
 	\end{itemize}
 \end{frame}
-\begin{frame}{The Challenge}
+
+\subsection{Scope}
+\begin{frame}
+	\emph{We will deal with}
 	\begin{itemize}
-		\item TODO: Initial project situation (i.e. 100 users)
-		\item TODO: Project objectives (i.e. 100K users)
+		\item OTP behaviours
+		\item TCP connections
+		\item mochiweb
+		\item Underlaying system configurations
+	\end{itemize}
+	\pause
+	\emph{We will \textbf{not} deal with}
+	\begin{itemize}
+		\item Multiple machines/nodes
+		\item Databases
 	\end{itemize}
 \end{frame}
 
@@ -50,9 +72,6 @@
 \begin{frame}{Steps}
 	TODO: this stage steps
 \end{frame}
-\begin{frame}{Results}{on Match Stream}
-	TODO: describe this stage results
-\end{frame}
 
 \subsection{Finding The Boundaries}
 \begin{frame}{Goals}
@@ -60,9 +79,6 @@
 \end{frame}
 \begin{frame}{Steps}
 	TODO: this stage steps
-\end{frame}
-\begin{frame}{Results}{on Match Stream}
-	TODO: describe this stage results
 \end{frame}
 
 \subsection{Blackbox Tests}
@@ -72,9 +88,6 @@
 \begin{frame}{Steps}
 	TODO: this stage steps
 \end{frame}
-\begin{frame}{Results}{on Match Stream}
-	TODO: describe this stage results
-\end{frame}
 
 \subsection{Erlang Tuning}
 \begin{frame}{Goals}
@@ -82,12 +95,6 @@
 \end{frame}
 \begin{frame}{Steps}
 	TODO: this stage steps
-\end{frame}
-\begin{frame}{Tips and Tricks}
-	TODO: describe this stage results
-\end{frame}
-\begin{frame}{Results}{on Match Stream}
-	TODO: describe this stage results
 \end{frame}
 
 \subsection{Adding Nodes}
@@ -97,8 +104,39 @@
 \begin{frame}{Steps}
 	TODO: this stage steps
 \end{frame}
-\begin{frame}{Results}{on Match Stream}
-	TODO: describe this stage results
+
+\section{Tips and Tricks}
+\subsection{TCP Tunning}
+\begin{frame}{OS tweaks}
+	TODO: Copy from the article
+\end{frame}
+\begin{frame}{Erlang tweaks}
+	TODO: Copy from the article on listeners
+	TODO: Copy from the article on inbound TCP connections
+	TODO: Copy from the article on outbound TCP connections
+\end{frame}
+\subsection{OTP}
+\begin{frame}{gen\textunderscore event}
+	TODO: Copy from the article on sup\textunderscore handler
+	TODO: Copy from the article on long delivery queues
+\end{frame}
+\begin{frame}{gen\textunderscore servers}
+	TODO: Copy from the article on timing out
+	TODO: Copy from the article on too much memory
+	TODO: Copy from the article on taking too long to initiliaze
+\end{frame}
+\begin{frame}{supervisors}
+	TODO: Copy from the article
+\end{frame}
+\subsection{Other Processes}
+\begin{frame}{Process Registration}
+	TODO: Copy from the article
+\end{frame}
+\begin{frame}{Timers}
+	TODO: Copy from the article
+\end{frame}
+\begin{frame}{Logging}
+	TODO: Copy from the article
 \end{frame}
 
 \section{Final Words}
