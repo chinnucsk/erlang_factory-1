@@ -7,6 +7,7 @@
 \usefonttheme[onlylarge]{structuresmallcapsserif}
 \usefonttheme[onlysmall]{structurebold}
 
+\setbeamercovered{dynamic}
 \setbeameroption{show notes}
 
 \begin{document}
@@ -35,11 +36,8 @@
 \section{The Challenge}
 \subsection{Description}
 \begin{frame}
-	We will work on the scalability of a \emph{web} project \pause that has a \emph{HTTP API} \pause and keeps clients \emph{connected} to the server \pause for \emph{long periods} of time.
-\end{frame}
-\begin{frame}
-	We will work on the scalability of a \emph{web} project that has a \emph{HTTP API} and keeps clients \emph{connected} to the server for \emph{long periods} of time.
-	For example:
+	We will work on the scalability of a \emph{web} project \pause that has a \emph{HTTP API} \pause and keeps clients \emph{connected} to the server \pause for \emph{long periods} of time.\\
+\pause Examples:
 	\begin{itemize}
 		\item Social sites
 		\item Chat sites
@@ -49,7 +47,7 @@
 
 \subsection{Scope}
 \begin{frame}
-	\emph{We will deal with}
+	\emph{We will work on}
 	\begin{itemize}
 		\item OTP behaviours
 		\item TCP connections
@@ -65,15 +63,16 @@
 \end{frame}
 
 \section{The Plan}
-\subsection{Is it really working?}
-\begin{frame}{Goals}
-	TODO: this stage goals
-\end{frame}
-\begin{frame}{Steps}
-	TODO: this stage steps
+\begin{frame}{General Considerations}
+	\begin{itemize}
+		\item<1,5> Be sure it's working
+		\item<2,5> Automate your clients
+		\item<3,5> Keep a human watching
+		\item<4,5> Be patient
+	\end{itemize}
 \end{frame}
 
-\subsection{Finding The Boundaries}
+\subsection{Finding The Initial Boundaries}
 \begin{frame}{Goals}
 	TODO: this stage goals
 \end{frame}
@@ -128,7 +127,7 @@
 \begin{frame}{supervisors}
 	TODO: Copy from the article
 \end{frame}
-\subsection{Other Processes}
+\subsection{Other Stuff}
 \begin{frame}{Process Registration}
 	TODO: Copy from the article
 \end{frame}
