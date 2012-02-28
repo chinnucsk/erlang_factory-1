@@ -20,15 +20,14 @@
 \frame{\titlepage} 
 
 \begin{frame}
-	\frametitle{Who am I?}
-	TODO: some funny stuff about Argentina, me, Erlang, elbrujohalcon... maybe some pictures
-	\note{Brief review of my story, why am I an Erlang programmer, how much I know about web applications and scalability}
-\end{frame}
-
-\begin{frame}
-	\frametitle{About Inaka}
-	TODO: Inaka's Info
-	\note{Brief review of Inaka's story, the systems we develop and why scalability matters to us}
+	\frametitle{Hello World!}
+	\begin{itemize}
+		\item<+-> I'm a developer since I was 10
+		\item<+-> I'm an Erlang developer since 2008
+		\item<+-> I've worked in many dynamic web sites
+		\item<+-> Most of them with high scale requirements
+		\item<+-> I'll share my experience with you 
+	\end{itemize}
 \end{frame}
 
 \frame{\frametitle{Outline}\tableofcontents[pausesections]} 
@@ -47,7 +46,7 @@
 
 \subsection{Scope}
 \begin{frame}
-	\emph{We will work on}
+	\emph{We will focus on}
 	\begin{itemize}
 		\item OTP behaviours
 		\item TCP connections
@@ -63,9 +62,13 @@
 \end{frame}
 
 \section{The Plan}
+\begin{frame}
+	\center{\textsc{\huge{The Plan}}}
+\end{frame}
+
 \begin{frame}{General Considerations}
 	\begin{itemize}
-		\item<1,5> Be sure it's working
+		\item<1,5> Create a system that \alert{works}
 		\item<2,5> Automate your clients
 		\item<3,5> Keep a human watching
 		\item<4,5> Be patient
@@ -74,34 +77,75 @@
 
 \subsection{Finding The Initial Boundaries}
 \begin{frame}{Goals}
-	TODO: this stage goals
+	\begin{itemize}
+		\item Test the system as it is
+		\item How many users can the system handle \alert{as is}?
+		\item Find $N$ and $C$
+	\end{itemize}
 \end{frame}
 \begin{frame}{Steps}
-	TODO: this stage steps
+	\begin{itemize}
+		\item Choose $N$ and $C$
+		\item Test the API
+		\item Test long-lived connections
+		\item Test both
+		\pause
+		\item Repeat with higher values for $N$ and $C$
+	\end{itemize}
 \end{frame}
 
 \subsection{Blackbox Tests}
 \begin{frame}{Goals}
-	TODO: this stage goals
+	\begin{itemize}
+		\item Improve the environment
+		\item Tune-In the machine(s)
+		\item \alert{Don't} touch the code
+	\end{itemize}
 \end{frame}
 \begin{frame}{Steps}
-	TODO: this stage steps
+	\begin{itemize}
+		\item Check kernel variables
+		\item Check system limits
+		\item Check Erlang VM parameters
+	\end{itemize}
 \end{frame}
 
 \subsection{Erlang Tuning}
 \begin{frame}{Goals}
-	TODO: this stage goals
+	\begin{itemize}
+		\item Tune up \alert{your} system
+		\item Discover scalability issues and fix them
+		\item Find the biggest $N$ and $C$ for \alert{one node}
+	\end{itemize}
 \end{frame}
 \begin{frame}{Steps}
-	TODO: this stage steps
+	\begin{itemize}
+		\item Choose $N$ and $C$ to fail
+		\item Find the problem
+		\item Fix it
+		\item Add it to the list of \emph{Tips and Tricks}
+		\pause
+		\item Repeat with higher values for $N$ and $C$
+	\end{itemize}
 \end{frame}
 
 \subsection{Adding Nodes}
 \begin{frame}{Goals}
-	TODO: this stage goals
+	\begin{itemize}
+		\item Get the system ready to work on many nodes
+		\item Decide if they should be connected or not
+		\item Find the $N$ and $C$ \alert{per node}
+	\end{itemize}
 \end{frame}
 \begin{frame}{Steps}
-	TODO: this stage steps
+	\begin{itemize}
+		\item Get the second node running
+		\item Choose $N$ and $C$
+		\item Try interconnected instances
+		\item Try independent instances
+		\pause
+		\item Repeat with higher values for $N$ and $C$
+	\end{itemize}
 \end{frame}
 
 \section{Tips and Tricks}
