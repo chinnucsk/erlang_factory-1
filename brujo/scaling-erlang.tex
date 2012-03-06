@@ -17,6 +17,13 @@
 \institute{Inaka Labs}
 \date{\today}
 
+\lstset{% general command to set parameter(s)
+		basicstyle=\ttfamily\tiny, % print whole listing small
+		keywordstyle=\color{black}\bfseries,
+		identifierstyle=, % nothing happens
+		stringstyle=\ttfamily, % typewriter type for strings
+		showstringspaces=false} % no special string spaces
+
 \frame{\titlepage} 
 
 \begin{frame}
@@ -30,12 +37,19 @@
 	\end{itemize}
 \end{frame}
 
-\frame{\frametitle{Outline}\tableofcontents[pausesections]} 
+% \frame{\frametitle{Outline}\tableofcontents[pausesections]}
+\begin{frame}{Outline}
+	\begin{description}
+		\item<+->[The Challenge] {\ \\ What do we have to deal with? \\ \ }
+		\item<+->[The Plan] {\ \\ How do we face it? \\ \  }
+		\item<+->[The Tips and Tricks] {\ \\ What have we learned from it? \\ \ }
+	\end{description}
+\end{frame}
 
 \section{The Challenge}
 \subsection{Description}
 \begin{frame}
-	We will work on the scalability of a \emph{web} project \pause that has a \emph{HTTP API} \pause and keeps clients \emph{connected} to the server \pause for \emph{long periods} of time.\\
+	We will work on the scalability of a \emph{web} project \pause that has an \emph{HTTP API} \pause and keeps clients \emph{connected} to the server \pause for \emph{long periods} of time.\\
 \pause Examples:
 	\begin{itemize}
 		\item Social sites
@@ -97,7 +111,7 @@
 \subsection{Blackbox Tests}
 \begin{frame}{Goals}
 	\begin{itemize}
-		\item Improve the environment
+		\item Improve the system environment
 		\item Tune-In the machine(s)
 		\item \alert{Don't} touch the code
 	\end{itemize}
@@ -121,7 +135,7 @@
 \begin{frame}{Steps}
 	\begin{itemize}
 		\item Choose $N$ and $C$ to fail
-		\item Find the problem
+		\item Find a problem
 		\item Fix it
 		\item Add it to the list of \emph{Tips and Tricks}
 		\pause
@@ -133,8 +147,8 @@
 \begin{frame}{Goals}
 	\begin{itemize}
 		\item Get the system ready to work on many nodes
-		\item Decide if they should be connected or not
-		\item Find the $N$ and $C$ \alert{per node}
+		\item Design the system topology
+		\item Find $N$ and $C$ \alert{per node}
 	\end{itemize}
 \end{frame}
 \begin{frame}{Steps}
@@ -150,8 +164,40 @@
 
 \section{Tips and Tricks}
 \subsection{TCP Tunning}
+
+\lstset{language=sh}
+\defverbatim[colored]\kernelvars{%
+\begin{lstlisting}[frame=single, emph={sysctl}, emphstyle={\color{blue}}]
+      sysctl -w net.ipv4.ip_local_port_range="1024 65535"
+      sysctl -w net.core.rmem_max=16777216
+      sysctl -w net.core.wmem_max=16777216
+      sysctl -w net.ipv4.tcp_rmem="4096 87380 16777216"
+      sysctl -w net.ipv4.tcp_wmem="4096 65536 16777216"
+      sysctl -w net.ipv4.tcp_syncookies=1
+      sysctl -w net.ipv4.tcp_mem="50576   64768   98152"
+      sysctl -w net.core.netdev_max_backlog=2500
+      sysctl -w net.netfilter.nf_conntrack_max=1233000
+\end{lstlisting}
+}
+\defverbatim[colored]\ulimit{%
+\begin{lstlisting}[frame=single, emph={ulimit}, emphstyle={\color{blue}}]
+      ulimit -n 999999
+\end{lstlisting}
+}
+
 \begin{frame}{OS tweaks}
-	TODO: Copy from the article
+	\emph{Kernel Variables}
+	\kernelvars
+	\pause
+	\emph{Open Files Limit}
+	\ulimit
+	\pause
+	\emph{Erlang VM tweaks}
+	\begin{description}
+		\item[+P] Number of Processes
+		\item[+K] Kernell Polling
+		\item[-smp] SMP Support
+	\end{description}
 \end{frame}
 \begin{frame}{Erlang tweaks}
 	TODO: Copy from the article on listeners
