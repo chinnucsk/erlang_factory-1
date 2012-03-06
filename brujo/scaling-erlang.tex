@@ -180,8 +180,16 @@
 \end{lstlisting}
 }
 \defverbatim[colored]\ulimit{%
-\begin{lstlisting}[frame=single, emph={ulimit}, emphstyle={\color{blue}}]
+\begin{lstlisting}[frame=single]
       ulimit -n 999999
+\end{lstlisting}
+}
+\lstset{language=erlang}
+\defverbatim[colored]\startchild{%
+\begin{lstlisting}[frame=single]
+      supervisor:start_child(
+      	list_to_atom("module-name_" ++
+				integer_to_list(random:uniform(#ofSupervisors))).
 \end{lstlisting}
 }
 
@@ -199,33 +207,68 @@
 		\item[-smp] SMP Support
 	\end{description}
 \end{frame}
-\begin{frame}{Erlang tweaks}
-	TODO: Copy from the article on listeners
-	TODO: Copy from the article on inbound TCP connections
-	TODO: Copy from the article on outbound TCP connections
+\begin{frame}{Connection tweaks}
+	\begin{description}
+		\item<+->[Backlog]\ \\
+			\begin{itemize}
+				\item Allow more concurrent connections
+				\item Remember HTTP \emph{runs on} TCP
+			\end{itemize}
+		\item<+->[Connections]\ \\
+			\begin{itemize}
+				\item Don't use just one of them
+				\item Check inbound and outbound connections
+			\end{itemize}
+	\end{description}
 \end{frame}
 \subsection{OTP}
 \begin{frame}{gen\textunderscore event}
-	TODO: Copy from the article on sup\textunderscore handler
-	TODO: Copy from the article on long delivery queues
+	\begin{description}
+		\item<+->[sup\textunderscore handler]\ \\
+			\begin{itemize}
+				\item Don't use it
+				\item Monitor the processes instead
+			\end{itemize}
+		\item<+->[Long Delivery Queues]\ \\
+			\begin{itemize}
+				\item Use \emph{repeaters}
+			\end{itemize}
+	\end{description}
 \end{frame}
 \begin{frame}{gen\textunderscore servers}
-	TODO: Copy from the article on timing out
-	TODO: Copy from the article on too much memory
-	TODO: Copy from the article on taking too long to initiliaze
+	\begin{description}
+		\item<+->[Call Timeouts]\ \\
+			Remember \texttt{gen\textunderscore server:reply/2}
+		\item<+->[Memory Footprint]\ \\
+			Remember \texttt{hibernate}
+		\item<+->[Long \texttt{init/1}]\ \\
+			Use $0$ timeout
+	\end{description}
 \end{frame}
 \begin{frame}{supervisors}
-	TODO: Copy from the article
+	\begin{itemize}
+		\item Sometimes \texttt{simple\textunderscore one\textunderscore for\textunderscore one} supervisors get \alert{overburdened} because they have too many children
+		\item Try a supervisor hierarchy with several managers below the main supervisor
+		\item Turn \texttt{supervisor:start\textunderscore child/2} calls into something like
+		\startchild
+	\end{itemize}
 \end{frame}
 \subsection{Other Stuff}
-\begin{frame}{Process Registration}
-	TODO: Copy from the article
-\end{frame}
-\begin{frame}{Timers}
-	TODO: Copy from the article
-\end{frame}
-\begin{frame}{Logging}
-	TODO: Copy from the article
+\begin{frame}
+	\begin{description}
+		\item<+->[Timers]\ \\
+			\begin{itemize}
+				\item Don't use the \texttt{timer} module
+				\item Use \texttt{erlang:send\textunderscore after}
+			\end{itemize}
+		\item<+->[Logging]\ \\
+			\begin{itemize}
+				\item Don't log too much
+				\item Use a good logging system
+			\end{itemize}
+		\item<+->[Registration]\ \\
+			Sometimes it's better to register processes instead of keeping track of their pids manually
+	\end{description}
 \end{frame}
 
 \section{Final Words}
