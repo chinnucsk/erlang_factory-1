@@ -274,11 +274,21 @@
 \section{Final Words}
 \subsection{Summary}
 \begin{frame}{Summary}
-	TODO: Summary
+	\begin{itemize}
+		\item<+-> It is an \alert{iterative} process
+		\item<+-> It worked awesomely for us in both experimental and real-life systems
+		\item<+-> It's no \alert{silver bullet}
+		\item<+-> The list of \emph{Tips and Tricks} grows \alert{constantly} over time
+	\end{itemize}
 \end{frame}
 \subsection{Other stuff}
 \begin{frame}{Other stuff}{that we left out of this presentation}
-	TODO: List of other scalability stuff we left out
+	\begin{itemize}
+		\item Adding nodes
+		\item Choosing databases
+		\item System specific improvements
+		\item Measuring tools
+	\end{itemize}
 \end{frame}
 \subsection{Questions}
 \begin{frame}
@@ -287,20 +297,10 @@
 
 \appendix
 
-\lstset{language=erlang}
-\defverbatim[colored]\mycode{%
-\begin{lstlisting}[frame=single, emph={fact}, emphstyle={\color{blue}}]
--spec fact(integer()) -> integer().
-fact(N) ->
-	lists:fold(fun(X, F) ->
-			F * X
-		   end, 1, lists:seq(1,N)).
-\end{lstlisting}
-}
-
-\section{Some Code}
 \begin{frame}
-\mycode
+	\begin{center}
+		{\Huge Thanks!}
+	\end{center}
 \end{frame}
 
 \end{document}
