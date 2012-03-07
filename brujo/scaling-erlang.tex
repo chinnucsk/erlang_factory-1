@@ -16,6 +16,7 @@
 \author{Fernando Benavides (\textit{@elbrujohalcon})}
 \institute{Inaka Labs}
 \date{\today}
+\logo{\includegraphics[height=0.5cm]{img/inaka_leaf_logo.png}}
 
 \lstset{% general command to set parameter(s)
 		basicstyle=\ttfamily\tiny, % print whole listing small
@@ -26,7 +27,7 @@
 
 \frame{\titlepage} 
 
-\begin{frame}
+\begin{frame}[t]
 	\frametitle{Hello World!}
 	\begin{itemize}
 		\item<+-> I'm a developer since I was 10
@@ -35,6 +36,21 @@
 		\item<+-> Most of them with high scale requirements
 		\item<+-> I'll share my experience with you 
 	\end{itemize}
+	\only<1>{
+		\begin{center}
+			\includegraphics[width=.65\textwidth]{img/Gorillas.png}
+		\end{center}
+	}
+	\only<2>{
+		\begin{center}
+			\includegraphics[width=.65\textwidth]{img/ErlangASCIIArt.png}
+		\end{center}
+	}
+	\only<5>{
+		\begin{center}
+			\includegraphics[width=.6\textwidth]{img/ShareButton.png}
+		\end{center}
+	}
 \end{frame}
 
 % \frame{\frametitle{Outline}\tableofcontents[pausesections]}
@@ -76,13 +92,15 @@
 \end{frame}
 
 \section{The Plan}
-\begin{frame}
-	\center{\textsc{\huge{The Plan}}}
+\begin{frame}{The Plan}
+	\begin{center}
+		\includegraphics[width=.65\textwidth]{img/challengeaccepted.jpg}
+	\end{center}
 \end{frame}
 
 \begin{frame}{General Considerations}
 	\begin{itemize}
-		\item<1,5> Create a system that \alert{works}
+		\item<1,5> Build a system that \alert{works}
 		\item<2,5> Automate your clients
 		\item<3,5> Keep a human watching
 		\item<4,5> Be patient
@@ -90,14 +108,16 @@
 \end{frame}
 
 \subsection{Finding The Initial Boundaries}
-\begin{frame}{Goals}
+\begin{frame}{Stage 1}{Finding The Initial Boundaries}
+	\textsc{Goals}
 	\begin{itemize}
 		\item Test the system as it is
 		\item How many users can the system handle \alert{as is}?
 		\item Find $N$ and $C$
 	\end{itemize}
 \end{frame}
-\begin{frame}{Steps}
+\begin{frame}{Stage 1}{Finding The Initial Boundaries}
+	\textsc{Steps}
 	\begin{itemize}
 		\item Choose $N$ and $C$
 		\item Test the API
@@ -109,30 +129,36 @@
 \end{frame}
 
 \subsection{Blackbox Tests}
-\begin{frame}{Goals}
+\begin{frame}{Stage 2}{Blackbox Tests}
+	\textsc{Goals}
 	\begin{itemize}
 		\item Improve the system environment
 		\item Tune-In the machine(s)
 		\item \alert{Don't} touch the code
 	\end{itemize}
 \end{frame}
-\begin{frame}{Steps}
+\begin{frame}{Stage 2}{Blackbox Tests}
+	\textsc{Steps}
 	\begin{itemize}
 		\item Check kernel variables
 		\item Check system limits
 		\item Check Erlang VM parameters
+		\pause
+		\item Repeat Stage 1
 	\end{itemize}
 \end{frame}
 
 \subsection{Erlang Tuning}
-\begin{frame}{Goals}
+\begin{frame}{Stage 3}{Erlang Tuning}
+	\textsc{Goals}
 	\begin{itemize}
 		\item Tune up \alert{your} system
 		\item Discover scalability issues and fix them
 		\item Find the biggest $N$ and $C$ for \alert{one node}
 	\end{itemize}
 \end{frame}
-\begin{frame}{Steps}
+\begin{frame}{Stage 3}{Erlang Tuning}
+	\textsc{Steps}
 	\begin{itemize}
 		\item Choose $N$ and $C$ to fail
 		\item Find a problem
@@ -144,14 +170,16 @@
 \end{frame}
 
 \subsection{Adding Nodes}
-\begin{frame}{Goals}
+\begin{frame}{Stage 4}{Adding Nodes}
+	\textsc{Goals}
 	\begin{itemize}
 		\item Get the system ready to work on many nodes
 		\item Design the system topology
 		\item Find $N$ and $C$ \alert{per node}
 	\end{itemize}
 \end{frame}
-\begin{frame}{Steps}
+\begin{frame}{Stage 4}{Adding Nodes}
+	\textsc{Steps}
 	\begin{itemize}
 		\item Get the second node running
 		\item Choose $N$ and $C$
@@ -163,6 +191,12 @@
 \end{frame}
 
 \section{Tips and Tricks}
+\begin{frame}{Tips and Tricks}
+	\begin{center}
+		\includegraphics[width=.65\textwidth]{img/macgyver.jpg}
+	\end{center}
+\end{frame}
+
 \subsection{TCP Tunning}
 
 \lstset{language=sh}
@@ -196,6 +230,12 @@
 \begin{frame}{OS tweaks}
 	\emph{Kernel Variables}
 	\kernelvars
+	\pause
+	\only<2>{
+		\begin{center}
+			\includegraphics[width=.5\textwidth]{img/omg.jpg}
+		\end{center}
+	}
 	\pause
 	\emph{Open Files Limit}
 	\ulimit
@@ -267,7 +307,10 @@
 				\item Use a good logging system
 			\end{itemize}
 		\item<+->[Registration]\ \\
-			Sometimes it's better to register processes instead of keeping track of their pids manually
+			\begin{itemize}
+				\item Sometimes it's better to register processes instead of keeping track of their pids manually
+				\item You can always register processes \alert{both} locally and globally
+			\end{itemize}
 	\end{description}
 \end{frame}
 
@@ -291,8 +334,10 @@
 	\end{itemize}
 \end{frame}
 \subsection{Questions}
-\begin{frame}
-	\alert{Any questions?}
+\begin{frame}{Questions}
+	\begin{center}
+		\includegraphics[width=\textwidth]{img/theriddler.jpg}
+	\end{center}
 \end{frame}
 
 \appendix
