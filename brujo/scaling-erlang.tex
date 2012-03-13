@@ -65,7 +65,7 @@
 \section{The Challenge}
 \subsection{Description}
 \begin{frame}{The Challenge}
-	We will work on the scalability of a \emph{web} project \pause that has an \emph{HTTP API} \pause and keeps clients \emph{connected} to the server \pause for \emph{long periods} of time.\\
+	We will work on the scalability of a \emph{web} project \pause that has an \emph{HTTP API} \pause and a component that keeps clients \emph{connected} to the server \pause for \emph{long periods} of time.\\
 \pause Examples:
 	\begin{itemize}
 		\item Social sites
@@ -73,18 +73,10 @@
 		\item Sports sites
 	\end{itemize}
 \end{frame}
-\begin{frame}[t]{Match Stream}{The Sample Project}
-	\includegraphics[top=-1,width=\textwidth]{img/MatchStream.png}
-\end{frame}
-\begin{frame}{Match Stream}{Initial Architecture}
-	\begin{center}
-		\includegraphics[height=.75\textheight]{img/running.png}
-	\end{center}
-\end{frame}
 
 \subsection{Scope}
 \begin{frame}{The Challenge}
-	\emph{We will focus on}
+	\emph{We will try to improve the way we use}
 	\begin{itemize}
 		\item OTP behaviours
 		\item TCP connections
@@ -95,8 +87,18 @@
 	\emph{We will \textbf{not} deal with}
 	\begin{itemize}
 		\item Multiple machines/nodes
-		\item Databases
+		\item Database choices and/or implementations
 	\end{itemize}
+\end{frame}
+
+\subsection{Sample Project}
+\begin{frame}[t]{Match Stream}{The Sample Project}
+	\includegraphics[width=\textwidth]{img/MatchStream.png}
+\end{frame}
+\begin{frame}{Match Stream}{Initial Architecture}
+	\begin{center}
+		\includegraphics[height=.75\textheight]{img/running.png}
+	\end{center}
 \end{frame}
 
 \section{The Plan}
@@ -106,9 +108,9 @@
 	\end{center}
 \end{frame}
 
-\begin{frame}{General Considerations}
+\begin{frame}{General Rules}{Things you need to know when scaling your systems}
 	\begin{itemize}
-		\item<1> Build a system that \alert{works}
+		\item<1> Start with a system that \alert{works}
 		\item<2> Automate your clients
 		\item<3> Keep a human watching
 		\item<4> Be patient
@@ -120,20 +122,21 @@
 	\textsc{Goals}
 	\begin{itemize}
 		\item Test the system as it is
-		\item How many users can the system handle \alert{as is}?
 		\item Find $N$ and $C$
+	\end{itemize}
+	\pause
+	\textsc{Steps}
+	\begin{itemize}
+		\item Create the automated testers
+		\item Choose $N$ and $C$
+		\item Test the API and long-lived connections independently
+		\item Test both together
+		\item Repeat until you find the highest $N$ and $C$
 	\end{itemize}
 \end{frame}
 \begin{frame}{Stage 1}{Finding The Initial Boundaries}
-	\textsc{Steps}
-	\begin{itemize}
-		\item Choose $N$ and $C$
-		\item Test the API
-		\item Test long-lived connections
-		\item Test both
-		\pause
-		\item Repeat with higher values for $N$ and $C$
-	\end{itemize}
+	\textsc{Results}
+	\includegraphics[top=-1,width=\textwidth]{img/MatchStream-1.png}
 \end{frame}
 
 \subsection{Blackbox Tests}
@@ -141,19 +144,20 @@
 	\textsc{Goals}
 	\begin{itemize}
 		\item Improve the system environment
-		\item Tune-In the machine(s)
-		\item \alert{Don't} touch the code
+		\item Find the highest $N$ and $C$ without altering the code
 	\end{itemize}
-\end{frame}
-\begin{frame}{Stage 2}{Blackbox Tests}
+	\pause
 	\textsc{Steps}
 	\begin{itemize}
 		\item Check kernel variables
 		\item Check system limits
 		\item Check Erlang VM parameters
-		\pause
-		\item Repeat Stage 1
+		\item Repeat \alert{from Stage 1}
 	\end{itemize}
+\end{frame}
+\begin{frame}{Stage 2}{Blackbox Tests}
+	\textsc{Results}
+	\includegraphics[top=-1,width=\textwidth]{img/MatchStream-2.png}
 \end{frame}
 
 \subsection{Erlang Tuning}
@@ -161,41 +165,48 @@
 	\textsc{Goals}
 	\begin{itemize}
 		\item Tune up \alert{your} system
-		\item Discover scalability issues and fix them
-		\item Find the biggest $N$ and $C$ for \alert{one node}
+		\item Find the highest $N$ and $C$ for \alert{one node}
+	\end{itemize}
+	\pause
+	\textsc{Steps}
+	\begin{itemize}
+		\item Find a problem
+		\item Fix it using the list of \emph{Tips and Tricks}
+		\item If not there, add it
+		\item Repeat \alert{from Stage 1}
 	\end{itemize}
 \end{frame}
 \begin{frame}{Stage 3}{Erlang Tuning}
-	\textsc{Steps}
-	\begin{itemize}
-		\item Choose $N$ and $C$ to fail
-		\item Find a problem
-		\item Fix it
-		\item Add it to the list of \emph{Tips and Tricks}
-		\pause
-		\item Repeat with higher values for $N$ and $C$
-	\end{itemize}
+	\textsc{Results}
+	\includegraphics[top=-1,width=\textwidth]{img/MatchStream-3.png}
 \end{frame}
 
 \subsection{Adding Nodes}
 \begin{frame}{Stage 4}{Adding Nodes}
 	\textsc{Goals}
 	\begin{itemize}
-		\item Get the system ready to work on many nodes
-		\item Design the system topology
+		\item Find the best system topology
 		\item Find $N$ and $C$ \alert{per node}
+	\end{itemize}
+	\pause
+	\textsc{Steps}
+	\begin{itemize}
+		\item Add a node
+		\begin{itemize}
+			\item connected; or
+			\item independent
+		\end{itemize}
+		\item Repeat \alert{from Stage 1}
 	\end{itemize}
 \end{frame}
 \begin{frame}{Stage 4}{Adding Nodes}
-	\textsc{Steps}
-	\begin{itemize}
-		\item Get the second node running
-		\item Choose $N$ and $C$
-		\item Try interconnected instances
-		\item Try independent instances
-		\pause
-		\item Repeat with higher values for $N$ and $C$
-	\end{itemize}
+	\textsc{Results}
+	\includegraphics[top=-1,width=\textwidth]{img/MatchStream-4.png}
+\end{frame}
+\begin{frame}{Match Stream}{Final Architecture}
+	\begin{center}
+		\includegraphics[height=.75\textheight]{img/running-late.png}
+	\end{center}
 \end{frame}
 
 \section{Tips and Tricks}
@@ -326,7 +337,7 @@
 \subsection{Summary}
 \begin{frame}{Summary}
 	\begin{itemize}
-		\item<+-> It is an \alert{iterative} process
+		\item<+-> This is an \alert{iterative} process
 		\item<+-> It worked awesomely for us in both experimental and real-life systems
 		\item<+-> It's no \alert{silver bullet}
 		\item<+-> The list of \emph{Tips and Tricks} grows \alert{constantly} over time
