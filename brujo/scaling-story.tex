@@ -1,0 +1,88 @@
+\documentclass[utf8]{beamer}
+\mode<presentation>
+\usepackage{listings}
+\usepackage{helvet}
+\usetheme{Warsaw}
+\usecolortheme{whale}
+\usefonttheme[onlylarge]{structuresmallcapsserif}
+\usefonttheme[onlysmall]{structurebold}
+\setbeamercovered{dynamic}
+
+\begin{document}
+\title{Scaling Erlang Web Applications}
+\subtitle{100 to 100K users at one web server}
+\author{Fernando Benavides (\textit{@elbrujohalcon})}
+\institute{Inaka Labs}
+\date{\today}
+\logo{\includegraphics[height=0.5cm]{img/inaka_leaf_logo.png}}
+
+\lstset{% general command to set parameter(s)
+		basicstyle=\ttfamily\tiny, % print whole listing small
+		keywordstyle=\color{black}\bfseries,
+		identifierstyle=, % nothing happens
+		stringstyle=\ttfamily, % typewriter type for strings
+		showstringspaces=false} % no special string spaces
+
+\frame{\titlepage}
+
+\begin{frame}
+A not so long time ago in a country far far away...
+\end{frame}
+
+\begin{frame}
+Hey! Boca is playing at the Bombonera now!
+Ok, let's watch it!
+I can't, man... I'm at the office
+...
+We need an app for that!
+\end{frame}
+
+\begin{frame}
+... So we created MatchStream ...
+\end{frame}
+
+\begin{frame}
+There will be hundreds of thousands of users, man!
+We need to \alert{scale}
+\pause
+Let's write it in Erlang, then
+\end{frame}
+
+\begin{frame}
+Several days after that...
+\pause
+MatchStream is ready!
+Boca plays again today, let's try it out with this game!
+\pause
+We can't handle more than 100 users, man! WTF?!?!
+\end{frame}
+
+\begin{frame}
+Lesson \#1: Just using Erlang is not enough to make a system scale
+\end{frame}
+
+\begin{frame}
+So... Let's make it scale!
+\end{frame}
+
+\begin{frame}
+Hello! I have this HUGE server where you can host MatchStream. That's all you need!
+\end{frame}
+
+\begin{frame}
+Lesson \#2: Even big servers should be tuned to handle your system requirements
+\end{frame}
+
+\begin{frame}
+So, we tuned it up concerning
+\begin{itemize}
+	\item<+-> Concurrent TCP connections
+	\item<+-> Open files limit
+	\item<+-> TCP backlog size
+	\item<+-> TCP memory allocation
+\end{itemize}
+\end{frame}
+
+...To be continued!
+
+\end{document}
