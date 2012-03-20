@@ -127,21 +127,22 @@
 \end{frame}
 
 \begin{frame}{Step 1}
-We made sure the system was working.
+First of all we wanted to be sure that the system was actually working.\\
 \pause
 \begin{itemize}
 	\item<+-> We built a simulator
 	\item<+-> We improved the logging mechanisms
 	\item<+-> We tested the system
+	\item<+-> We found its initial scale limits
 \end{itemize}
 \end{frame}
 
-\begin{frame}
-1024 users / 4 at a time
+\begin{frame}{Step 1}{Results}
+	\includegraphics[top=-1,width=\textwidth]{img/MatchStream-1.png}
 \end{frame}
 
 \begin{frame}{Step 2}
-The system is fine, let's tune up the server where it's installed
+Once we knew the system was fine, we decided to tune up the server where it was installed.
 \pause
 So, we checked the kernel variables and system limits for
 \begin{itemize}
@@ -153,14 +154,17 @@ So, we checked the kernel variables and system limits for
 \end{itemize}
 \end{frame}
 
-\begin{frame}
-4096 users / 4 at a time
+\begin{frame}{Step 2}{Results}
+	\includegraphics[top=-1,width=\textwidth]{img/MatchStream-2.png}
 \end{frame}
 
-\begin{frame}{Step 3}
-I've got a friend that may help us, he has a bag with several tips and tricks for us...
+\begin{frame}[t]{Step 3}
+Then we decided to start improving the different components of the system.\\
 \pause
-MacGyver
+We called a friend to help us\ldots
+	\begin{center}
+		\includegraphics<3>[width=.65\textwidth]{img/macgyver.jpg}
+	\end{center}
 \end{frame}
 
 \begin{frame}{Step 3}{Connection tweaks}
@@ -257,8 +261,8 @@ TODO users / TODO at a time
 	\end{description}
 \end{frame}
 
-\begin{frame}
-64000 users / 8000 at a time
+\begin{frame}{Step 3}{Results}
+	\includegraphics[top=-1,width=\textwidth]{img/MatchStream-3.png}
 \end{frame}
 
 \begin{frame}
@@ -283,12 +287,8 @@ We had to decide which processes needed to communicate and how
 and of course, test the whole system again
 \end{frame}
 
-\begin{frame}
-25000 users per node / 8000 per computer at a time
-\pause
-with 4 nodes on the same computer...
-\pause
-100K users / 8000 at a time
+\begin{frame}{Step 4}{Results}
+	\includegraphics[top=-1,width=\textwidth]{img/MatchStream-4.png}
 \end{frame}
 
 \end{document}
