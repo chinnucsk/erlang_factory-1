@@ -26,13 +26,23 @@
 \frame{\titlepage}
 
 \begin{frame}
+Inaka Networks presents...
+\pause
+El Brujo Halc\'on in...
+\pause
+Scaling Erlang
+\pause
+(Based on a true story)
+\end{frame}
+
+\begin{frame}
 A not so long time ago in a country far far away...
 \end{frame}
 
 \begin{frame}
 Hey! Boca is playing at the Bombonera now!
 Ok, let's watch it!
-I can't, man... I'm at the office
+I can't, I'm at \emph{the office}
 ...
 We need an app for that!
 \end{frame}
@@ -42,47 +52,198 @@ We need an app for that!
 \end{frame}
 
 \begin{frame}
-There will be hundreds of thousands of users, man!
-We need to \alert{scale}
+Ok, then... We know there will be hundreds of thousands of users, right?
+We need the system to \alert{scale}
 \pause
-Let's write it in Erlang, then
+Of course! We should use Erlang!
 \end{frame}
 
 \begin{frame}
 Several days after that...
 \pause
 MatchStream is ready!
+TODO: INSERT SYSTEM DESCRIPTION HERE
+\end{frame}
+
+\begin{frame}
 Boca plays again today, let's try it out with this game!
 \pause
-We can't handle more than 100 users, man! WTF?!?!
+Wait, we can't handle more than 1000 users?! WTF?!?!
+\pause
+And they can only connect four at a time???
 \end{frame}
 
 \begin{frame}
-Lesson \#1: Just using Erlang is not enough to make a system scale
+Lesson Learned: Just using Erlang is not enough to make your system scale
 \end{frame}
 
 \begin{frame}
-So... Let's make it scale!
+So... What did we do?
+\end{frame}
+
+\begin{frame}{Step 1}
+We made sure the system was working.
+\pause
+\begin{itemize}
+	\item<+-> We built a simulator
+	\item<+-> We improved the logging mechanisms
+	\item<+-> We tested the system
+\end{itemize}
 \end{frame}
 
 \begin{frame}
-Hello! I have this HUGE server where you can host MatchStream. That's all you need!
+1024 users / 4 at a time
 \end{frame}
 
-\begin{frame}
-Lesson \#2: Even big servers should be tuned to handle your system requirements
-\end{frame}
-
-\begin{frame}
-So, we tuned it up concerning
+\begin{frame}{Step 2}
+The system is fine, let's tune up the server where it's installed
+\pause
+So, we checked the kernel variables and system limits for
 \begin{itemize}
 	\item<+-> Concurrent TCP connections
 	\item<+-> Open files limit
 	\item<+-> TCP backlog size
 	\item<+-> TCP memory allocation
+	\item<+-> Erlang VM process limit
 \end{itemize}
 \end{frame}
 
-...To be continued!
+\begin{frame}
+4096 users / 4 at a time
+\end{frame}
+
+\begin{frame}{Step 3}
+I've got a friend that may help us, he has a bag with several tips and tricks for us...
+\pause
+MacGyver
+\end{frame}
+
+\begin{frame}{Step 3}{Connection tweaks}
+	\begin{description}
+		\item<+->[Backlog]\ \\
+			\begin{itemize}
+				\item Allow more concurrent connections
+				\item Remember HTTP \emph{runs on} TCP
+			\end{itemize}
+		\item<+->[Connections]\ \\
+			\begin{itemize}
+				\item Don't use just one of them
+				\item Check inbound and outbound connections
+			\end{itemize}
+	\end{description}
+\end{frame}
+
+\begin{frame}
+TODO users / TODO at a time
+\end{frame}
+
+\begin{frame}{Step 3}{gen\textunderscore event}
+	\begin{description}
+		\item<+->[sup\textunderscore handler]\ \\
+			\begin{itemize}
+				\item Don't use it
+				\item Monitor the processes instead
+			\end{itemize}
+		\item<+->[Long Delivery Queues]\ \\
+			\begin{itemize}
+				\item Use \emph{repeaters}
+			\end{itemize}
+	\end{description}
+\end{frame}
+
+\begin{frame}
+TODO users / TODO at a time
+\end{frame}
+
+\begin{frame}{Step 3}{gen\textunderscore server}
+	\begin{description}
+		\item<+->[Call Timeouts]\ \\
+			Remember \texttt{gen\textunderscore server:reply/2}
+		\item<+->[Memory Footprint]\ \\
+			Remember \texttt{hibernate}
+		\item<+->[Long \texttt{init/1}]\ \\
+			Use $0$ timeout
+	\end{description}
+\end{frame}
+
+\begin{frame}
+TODO users / TODO at a time
+\end{frame}
+
+\lstset{language=erlang}
+\defverbatim[colored]\startchild{%
+\begin{lstlisting}[frame=single]
+      supervisor:start_child(
+      	list_to_atom("module-name_" ++
+				integer_to_list(random:uniform(#ofSupervisors))).
+\end{lstlisting}
+}
+
+\begin{frame}{Step 3}{supervisors}
+	\begin{itemize}
+		\item Sometimes \texttt{simple\textunderscore one\textunderscore for\textunderscore one} supervisors get \alert{overburdened} because they have too many children
+		\item Try a supervisor hierarchy with several managers below the main supervisor
+		\item Turn \texttt{supervisor:start\textunderscore child/2} calls into something like
+		\startchild
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+TODO users / TODO at a time
+\end{frame}
+
+\begin{frame}{Step 3}{Other Processes}
+	\begin{description}
+		\item<+->[Timers]\ \\
+			\begin{itemize}
+				\item Don't use the \texttt{timer} module
+				\item Use \texttt{erlang:send\textunderscore after}
+			\end{itemize}
+		\item<+->[Logging]\ \\
+			\begin{itemize}
+				\item Don't log too much
+				\item Use a good logging system
+			\end{itemize}
+		\item<+->[Registration]\ \\
+			\begin{itemize}
+				\item Sometimes it's better to register processes instead of keeping track of their pids manually
+				\item You can always register processes \alert{both} locally and globally
+			\end{itemize}
+	\end{description}
+\end{frame}
+
+\begin{frame}
+64000 users / 8000 at a time
+\end{frame}
+
+\begin{frame}
+TODO: Img of what the system looks like at this point
+\end{frame}
+
+\begin{frame}{Step 4}
+Well, let's add some nodes to it!
+\end{frame}
+
+\begin{frame}{Step 4}{Adding Nodes}
+Again, it's not as easy as just starting the app in another Erlang node
+\pause
+We needed to find the best topology, we considered using:
+	\begin{itemize}
+		\item connected nodes
+		\item independent nodes
+	\end{itemize}
+\pause
+We had to decide which processes needed to communicate and how
+\pause
+and of course, test the whole system again
+\end{frame}
+
+\begin{frame}
+25000 users per node / 8000 per computer at a time
+\pause
+with 4 nodes on the same computer...
+\pause
+100K users / 8000 at a time
+\end{frame}
 
 \end{document}
