@@ -25,26 +25,53 @@
 
 \frame{\titlepage}
 
+\setbeamercolor{stamp}{fg=black,bg=yellow}
+
 \begin{frame}
-Inaka Networks presents...
-\pause
-El Brujo Halc\'on in...
-\pause
-Scaling Erlang
-\pause
-(Based on a true story)
+\only<1,2>{
+	\begin{center}
+		\textsc{{\Huge Inaka Networks}}
+	\end{center}
+\onslide<2>{
+	\begin{center}
+		presents \ldots
+	\end{center}}}
+\only<3,4>{
+	\begin{center}
+		\textit{{\LARGE El Brujo Halc\'on}}
+	\end{center}
+\onslide<4>{
+	\begin{center}
+		in \ldots
+	\end{center}}}
+\only<5,6>{
+	\begin{center}
+		\textsc{{\huge Scaling Erlang}}
+	\end{center}
+\onslide<6>{
+	\begin{beamercolorbox}[right,wd=1\textwidth,shadow=true,rounded=true]{stamp}
+		\emph{Based on a true story}
+	\end{beamercolorbox}
+	}}
 \end{frame}
 
 \begin{frame}
-A not so long time ago in a country far far away...
+	\begin{center}
+		{\Large
+			\textsf{
+				A \emph{not so} long time ago \pause
+				\includegraphics<2>[width=.75\textwidth]{img/map.jpg}\\
+				\only<2>{in a country far far away\ldots}}}
+	\end{center}
 \end{frame}
 
 \begin{frame}
-Hey! Boca is playing at the Bombonera now!
-Ok, let's watch it!
-I can't, I'm at \emph{the office}
-...
-We need an app for that!
+	\begin{description}
+		\item<+->[Friend]\ \\ Hey! Let's watch the \emph{supercl\'asico}!!!
+		\item<+->[Brujo]\ \\ I can't, I'm at \emph{the office}
+		\item<+->[Friend]\ \\ \ldots
+		\item<+->[Brujo]\ \\ We need an app for that!
+	\end{description}
 \end{frame}
 
 \begin{frame}
