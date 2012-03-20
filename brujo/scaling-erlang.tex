@@ -34,7 +34,7 @@
 		\item<+-> I'm an Erlang developer since 2008
 		\item<+-> I've worked in many dynamic web sites
 		\item<+-> Most of them with high scale requirements
-		\item<+-> I'll share my experience with you 
+		\item<+-> I'll share my experience with you
 	\end{itemize}
 	\only<1>{
 		\begin{center}
@@ -46,41 +46,28 @@
 			\includegraphics[width=.65\textwidth]{img/ErlangASCIIArt.png}
 		\end{center}
 	}
-	\only<5>{
-		\begin{center}
-			\includegraphics[width=.6\textwidth]{img/ShareButton.png}
-		\end{center}
-	}
 \end{frame}
 
-% \frame{\frametitle{Outline}\tableofcontents[pausesections]}
-\begin{frame}{Outline}
-	\begin{description}
-		\item<+->[The Challenge] {\ \\ What do we have to deal with? \\ \ }
-		\item<+->[The Plan] {\ \\ How do we face it? \\ \  }
-		\item<+->[The Tips and Tricks] {\ \\ What have we learned from it? \\ \ }
-	\end{description}
-\end{frame}
+\frame{\frametitle{Outline}\tableofcontents[pausesections]}
 
-\section{The Challenge}
+\section{Introduction}
 \subsection{Description}
-\begin{frame}{The Challenge}
+\begin{frame}{Introduction}
 	We will work on the scalability of a \emph{web} project \pause that has an \emph{HTTP API} \pause and a component that keeps clients \emph{connected} to the server \pause for \emph{long periods} of time.\\
 \pause Examples:
 	\begin{itemize}
-		\item Social sites
-		\item Chat sites
-		\item Sports sites
+		\item<+-> Social sites
+		\item<+-> Chat sites
+		\item<+-> Sports sites
 	\end{itemize}
 \end{frame}
 
 \subsection{Scope}
-\begin{frame}{The Challenge}
+\begin{frame}{Scope}
 	\emph{We will try to improve the way we use}
 	\begin{itemize}
 		\item OTP behaviours
-		\item TCP connections
-		\item mochiweb
+		\item TCP and HTTP connections
 		\item Underlaying system configurations
 	\end{itemize}
 	\pause
@@ -91,20 +78,58 @@
 	\end{itemize}
 \end{frame}
 
-\subsection{Sample Project}
-\begin{frame}[t]{Match Stream}{The Sample Project}
+\section{The Project}
+\subsection{Idea}
+\begin{frame}{Match Stream}
+	TODO: General system design graph
+\end{frame}
+\begin{frame}{Requirements}
+	This kind of system requires\ldots \pause
+	\begin{itemize}
+		\item<+-> Tons of users
+		\item<+-> In two-hour-long bursts
+		\item<+-> Real-time updates
+	\end{itemize}
+	\onslide<+->Erlang seems to be \textbf{the right fit for this}
+\end{frame}
+
+\subsection{Design}
+\begin{frame}{Match Stream}{General Design}
 	\includegraphics[width=\textwidth]{img/MatchStream.png}
 \end{frame}
-\begin{frame}{Match Stream}{Initial Architecture}
+\begin{frame}{Match Stream}{Architecture}
 	\begin{center}
 		\includegraphics[height=.75\textheight]{img/running.png}
 	\end{center}
 \end{frame}
+\subsection{Components}
+\begin{frame}{For the Clients}
+	\begin{description}
+		\item<+->[client\_listener]\ \\
+			\texttt{gen\_server}. Handles a listening TCP port to receive clients
+		\item<+->[client\_sup]\ \\
+			\texttt{supervisor}. Supervises client processes
+		\item<+->[user\_sup]\ \\
+			\texttt{supervisor}. Supervises user processes
+		\item<+->[web]\ \\
+			\texttt{mochiweb}. Listener for HTTP API calls
+	\end{description}
+\end{frame}
+\begin{frame}{DB and Matches}
+	\begin{description}
+		\item<+->[db]\ \\
+			\texttt{gen\_server}. Handles a connection to the DB
+		\item<+->[match\_sup]\ \\
+			\texttt{supervisor}. Supervises match processes
+	\end{description}
+\end{frame}
 
-\section{The Plan}
-\begin{frame}{The Plan}
+I'M HERE
+
+\section{Scaling}
+\begin{frame}{Lesson Learned}
 	\begin{center}
-		\includegraphics[width=.65\textwidth]{img/challengeaccepted.jpg}
+		\Large \emph{Using Erlang to build your system is \textbf{not enough} to ensure \textbf{scalability}}
 	\end{center}
 \end{frame}
 
