@@ -67,45 +67,63 @@
 
 \begin{frame}
 	\begin{description}
-		\item<+->[Friend]\ \\ Hey! Let's watch the \emph{supercl\'asico}!!!
+		\item<+->[A Friend]\ \\ Hey! Let's watch the \emph{supercl\'asico}!!!
 		\item<+->[Brujo]\ \\ I can't, I'm at \emph{the office}
-		\item<+->[Friend]\ \\ \ldots
+		\item<+->[A Friend]\ \\ \ldots
 		\item<+->[Brujo]\ \\ We need an app for that!
 	\end{description}
 \end{frame}
 
 \begin{frame}
-... So we created MatchStream ...
+	\begin{description}
+		\item<+->[Brujo]\ \\ Let's call it \textsc{MatchStream}
+		\item<+->[A Friend]\ \\ Ok, then\ldots We know there will be hundreds of thousands of users, right?\\ We need the system to \textbf{scale}
+		\item<+->[Brujo]\ \\ Of course! We should use \alert{Erlang}!
+	\end{description}
 \end{frame}
 
 \begin{frame}
-Ok, then... We know there will be hundreds of thousands of users, right?
-We need the system to \alert{scale}
-\pause
-Of course! We should use Erlang!
+	\begin{center}
+		{\Large
+			\textsf{A while later\ldots}}
+	\end{center}
+\end{frame}
+
+\begin{frame}{MatchStream}{System Description}
+\includegraphics[width=\textwidth]{img/MatchStream.png}
+\end{frame}
+
+\begin{frame}{MatchStream}{Architecture}
+	\begin{center}
+		\includegraphics[height=.75\textheight]{img/running.png}
+	\end{center}
+	TODO: Take this picture with client(s) connected
 \end{frame}
 
 \begin{frame}
-Several days after that...
-\pause
-MatchStream is ready!
-TODO: INSERT SYSTEM DESCRIPTION HERE
+	\begin{description}
+		\item<+->[Brujo]\ \\ Boca plays again today, let's try our system out with this game!\\ What can \textbf{possibly} go wrong?
+		\item<+->[User 1]\ \\ Wow! \textsc{MatchStream} is awesome!
+		\item<+->[\ldots]\ 
+		\item<+->[User 100]\ \\ Hey! this system is a total crap! It doesn't even let me connect to it!
+		\item<+->[Brujo]\ \\ WTF?! \alert{The system doesn't scale}!!
+		\item<+->[A Friend]\ \\ Didn't you use \alert{Erlang}?
+	\end{description}
 \end{frame}
 
 \begin{frame}
-Boca plays again today, let's try it out with this game!
-\pause
-Wait, we can't handle more than 1000 users?! WTF?!?!
-\pause
-And they can only connect four at a time???
+	\begin{beamercolorbox}[wd=1\textwidth,shadow=true,rounded=true]{stamp}
+		\emph{\textsc{Lesson Learned}}
+	\end{beamercolorbox}
+	\ \\
+	\textbf{Just using Erlang is not enough to make your system scale}
 \end{frame}
 
 \begin{frame}
-Lesson Learned: Just using Erlang is not enough to make your system scale
-\end{frame}
-
-\begin{frame}
-So... What did we do?
+	\begin{center}
+		{\Large
+			\textsf{So, we made it scale\ldots}}
+	\end{center}
 \end{frame}
 
 \begin{frame}{Step 1}
