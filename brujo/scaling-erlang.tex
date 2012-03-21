@@ -25,16 +25,28 @@
 		stringstyle=\ttfamily, % typewriter type for strings
 		showstringspaces=false} % no special string spaces
 
+\lstset{language=erlang}
+\defverbatim[colored]\startchild{%
+\begin{lstlisting}[frame=single]
+      supervisor:start_child(
+      	list_to_atom("module-name_" ++
+				integer_to_list(random:uniform(#ofSupervisors))).
+\end{lstlisting}
+}
+
 \frame{\titlepage} 
 
-\begin{frame}[t]
+\begin{frame}
 	\frametitle{Hello World!}
 	\begin{itemize}
 		\item<+-> I'm a developer since I was 10
 		\item<+-> I'm an Erlang developer since 2008
-		\item<+-> I've worked in many dynamic web sites
-		\item<+-> Most of them with high scale requirements
-		\item<+-> I'll share my experience with you
+		\item<+-> I've worked in several dynamic web servers
+			\begin{itemize}
+				\item<+-> Many of them with real-time updates
+				\item<+-> Most of them with high scale requirements
+			\end{itemize}
+		\item<+-> I'll show you how I make them scale
 	\end{itemize}
 	\only<1>{
 		\begin{center}
@@ -47,8 +59,6 @@
 		\end{center}
 	}
 \end{frame}
-
-\frame{\frametitle{Outline}\tableofcontents[pausesections]}
 
 \section{Introduction}
 \subsection{Description}
@@ -78,16 +88,16 @@
 	\end{itemize}
 \end{frame}
 
-\section{The Project}
+\section{Match Stream}
 \subsection{Idea}
 \begin{frame}{Match Stream}
 	TODO: General system design graph
 \end{frame}
-\begin{frame}{Requirements}
-	This kind of system requires\ldots \pause
+\begin{frame}{Match Stream}{Requirements}
+	\textsc{System Challenges}
 	\begin{itemize}
-		\item<+-> Tons of users
-		\item<+-> In two-hour-long bursts
+		\item<+-> Tons of concurrent users
+		\item<+-> Two-hour-long bursts of connections followed by long periods of inactivity
 		\item<+-> Real-time updates
 	\end{itemize}
 	\onslide<+->Erlang seems to be \textbf{the right fit for this}
@@ -103,19 +113,19 @@
 	\end{center}
 \end{frame}
 \subsection{Components}
-\begin{frame}{For the Clients}
+\begin{frame}{Match Stream}{Client-handling Components}
 	\begin{description}
 		\item<+->[client\_listener]\ \\
-			\texttt{gen\_server}. Handles a listening TCP port to receive clients
+			\texttt{gen\_server}. Listens on a TCP port to receive client connections
 		\item<+->[client\_sup]\ \\
-			\texttt{supervisor}. Supervises client processes
+			\texttt{supervisor}. Supervises connection processes
 		\item<+->[user\_sup]\ \\
 			\texttt{supervisor}. Supervises user processes
 		\item<+->[web]\ \\
-			\texttt{mochiweb}. Listener for HTTP API calls
+			\texttt{mochiweb server}. Listens for HTTP API calls
 	\end{description}
 \end{frame}
-\begin{frame}{DB and Matches}
+\begin{frame}{Match Stream}{DB and Watcher Components}
 	\begin{description}
 		\item<+->[db]\ \\
 			\texttt{gen\_server}. Handles a connection to the DB
@@ -124,73 +134,59 @@
 	\end{description}
 \end{frame}
 
-I'M HERE
-
 \section{Scaling}
 \begin{frame}{Lesson Learned}
 	\begin{center}
-		\Large \emph{Using Erlang to build your system is \textbf{not enough} to ensure \textbf{scalability}}
+		\huge \emph{Using Erlang to build your system is \textbf{not enough} to ensure \textbf{scalability}}
 	\end{center}
 \end{frame}
 
-\begin{frame}{General Rules}{Things you need to know when scaling your systems}
-	\begin{itemize}
-		\item<1> Start with a system that \alert{works}
-		\item<2> Automate your clients
-		\item<3> Keep a human watching
-		\item<4> Be patient
-	\end{itemize}
-\end{frame}
-
-\subsection{Finding The Initial Boundaries}
-\begin{frame}{Stage 1}{Finding The Initial Boundaries}
+\subsection{Stage 1: The Original System}
+\begin{frame}{Stage 1}{Testing the system as it is}
 	\textsc{Goals}
 	\begin{itemize}
-		\item Test the system as it is
-		\item Find $N$ and $C$
+		\item Find how much the system can handle
 	\end{itemize}
 	\pause
 	\textsc{Steps}
 	\begin{itemize}
-		\item Create the automated testers
-		\item Choose $N$ and $C$
-		\item Test the API and long-lived connections independently
-		\item Test both together
-		\item Repeat until you find the highest $N$ and $C$
+		\item Create automated testers
+		\item Start the system on a \emph{clean} machine
+		\item Test repeatedly adjusting the number of connections
+		\item Have a human trying the system himself
 	\end{itemize}
 \end{frame}
-\begin{frame}{Stage 1}{Finding The Initial Boundaries}
+\begin{frame}{Stage 1}{Testing the system as it is}
 	\textsc{Results}
 	\includegraphics[top=-1,width=\textwidth]{img/MatchStream-1.png}
 \end{frame}
 
-\subsection{Blackbox Tests}
-\begin{frame}{Stage 2}{Blackbox Tests}
+\subsection{Stage 2: OS Tuning}
+\begin{frame}{Stage 2}{Improving the Environment}
 	\textsc{Goals}
 	\begin{itemize}
-		\item Improve the system environment
-		\item Find the highest $N$ and $C$ without altering the code
+		\item Improve the system environment without altering the code
 	\end{itemize}
 	\pause
-	\textsc{Steps}
+	\textsc{Settings to Tune Up}
 	\begin{itemize}
-		\item Check kernel variables
-		\item Check system limits
-		\item Check Erlang VM parameters
-		\item Repeat \alert{from Stage 1}
+		\item<+-> Concurrent TCP connections
+		\item<+-> Open files limit
+		\item<+-> TCP backlog size
+		\item<+-> TCP memory allocation
+		\item<+-> Erlang VM startup parameters
 	\end{itemize}
 \end{frame}
-\begin{frame}{Stage 2}{Blackbox Tests}
+\begin{frame}{Stage 2}{Improving the Environment}
 	\textsc{Results}
 	\includegraphics[top=-1,width=\textwidth]{img/MatchStream-2.png}
 \end{frame}
 
-\subsection{Erlang Tuning}
-\begin{frame}{Stage 3}{Erlang Tuning}
+\subsection{Stage 3: Erlang Tuning}
+\begin{frame}{Stage 3}{Improving Match Stream}
 	\textsc{Goals}
 	\begin{itemize}
-		\item Tune up \alert{your} system
-		\item Find the highest $N$ and $C$ for \alert{one node}
+		\item Tune up the system for \alert{one node}
 	\end{itemize}
 	\pause
 	\textsc{Steps}
@@ -198,100 +194,12 @@ I'M HERE
 		\item Find a problem
 		\item Fix it using the list of \emph{Tips and Tricks}
 		\item If not there, add it
-		\item Repeat \alert{from Stage 1}
+		\item Repeat from \alert{Stage 1}
 	\end{itemize}
 \end{frame}
-\begin{frame}{Stage 3}{Erlang Tuning}
-	\textsc{Results}
-	\includegraphics[top=-1,width=\textwidth]{img/MatchStream-3.png}
-\end{frame}
 
-\subsection{Adding Nodes}
-\begin{frame}{Stage 4}{Adding Nodes}
-	\textsc{Goals}
-	\begin{itemize}
-		\item Find the best system topology
-		\item Find $N$ and $C$ \alert{per node}
-	\end{itemize}
-	\pause
-	\textsc{Steps}
-	\begin{itemize}
-		\item Add a node
-		\begin{itemize}
-			\item connected; or
-			\item independent
-		\end{itemize}
-		\item Repeat \alert{from Stage 1}
-	\end{itemize}
-\end{frame}
-\begin{frame}{Stage 4}{Adding Nodes}
-	\textsc{Results}
-	\includegraphics[top=-1,width=\textwidth]{img/MatchStream-4.png}
-\end{frame}
-\begin{frame}{Match Stream}{Final Architecture}
-	\begin{center}
-		\includegraphics[height=.75\textheight]{img/running-late.png}
-	\end{center}
-\end{frame}
-
-\section{Tips and Tricks}
-\begin{frame}{Tips and Tricks}
-	\begin{center}
-		\includegraphics[width=.65\textwidth]{img/macgyver.jpg}
-	\end{center}
-\end{frame}
-
-\subsection{TCP Tunning}
-
-\lstset{language=sh}
-\defverbatim[colored]\kernelvars{%
-\begin{lstlisting}[frame=single, emph={sysctl}, emphstyle={\color{blue}}]
-      sysctl -w net.ipv4.ip_local_port_range="1024 65535"
-      sysctl -w net.core.rmem_max=16777216
-      sysctl -w net.core.wmem_max=16777216
-      sysctl -w net.ipv4.tcp_rmem="4096 87380 16777216"
-      sysctl -w net.ipv4.tcp_wmem="4096 65536 16777216"
-      sysctl -w net.ipv4.tcp_syncookies=1
-      sysctl -w net.ipv4.tcp_mem="50576   64768   98152"
-      sysctl -w net.core.netdev_max_backlog=2500
-      sysctl -w net.netfilter.nf_conntrack_max=1233000
-\end{lstlisting}
-}
-\defverbatim[colored]\ulimit{%
-\begin{lstlisting}[frame=single]
-      ulimit -n 999999
-\end{lstlisting}
-}
-\lstset{language=erlang}
-\defverbatim[colored]\startchild{%
-\begin{lstlisting}[frame=single]
-      supervisor:start_child(
-      	list_to_atom("module-name_" ++
-				integer_to_list(random:uniform(#ofSupervisors))).
-\end{lstlisting}
-}
-
-\begin{frame}{OS tweaks}
-	\emph{Kernel Variables}
-	\kernelvars
-	\pause
-	\only<2>{
-		\begin{center}
-			\includegraphics[width=.5\textwidth]{img/omg.jpg}
-		\end{center}
-	}
-	\pause
-	\emph{Open Files Limit}
-	\ulimit
-	\pause
-	\emph{Erlang VM tweaks}
-	\begin{description}
-		\item[+P] Number of Processes
-		\item[+K] Kernell Polling
-		\item[-smp] SMP Support
-	\end{description}
-\end{frame}
-\begin{frame}{Connection tweaks}
+\subsubsection{TCP Tuning}
+\begin{frame}{Stage 3.1}{Connection Tweaks}
 	\begin{description}
 		\item<+->[Backlog]\ \\
 			\begin{itemize}
@@ -305,8 +213,19 @@ I'M HERE
 			\end{itemize}
 	\end{description}
 \end{frame}
-\subsection{OTP}
-\begin{frame}{gen\textunderscore event}
+\begin{frame}{Stage 3.1}{Connection Tweaks}
+	\textsc{System Architecture}
+	\begin{center}
+		\includegraphics[height=.75\textheight]{img/running-late.png}
+	\end{center}
+\end{frame}
+\begin{frame}{Stage 3.1}{Connection Tweaks}
+	\textsc{Results}
+	\includegraphics[top=-1,width=\textwidth]{img/MatchStream-3.png}
+\end{frame}
+
+\subsubsection{OTP}
+\begin{frame}{Stage 3.2}{gen\textunderscore event}
 	\begin{description}
 		\item<+->[sup\textunderscore handler]\ \\
 			\begin{itemize}
@@ -319,7 +238,17 @@ I'M HERE
 			\end{itemize}
 	\end{description}
 \end{frame}
-\begin{frame}{gen\textunderscore server}
+\begin{frame}{Stage 3.2}{gen\textunderscore event}
+	\textsc{System Architecture}
+	\begin{center}
+		\includegraphics[height=.75\textheight]{img/running-late.png}
+	\end{center}
+\end{frame}
+\begin{frame}{Stage 3.2}{gen\textunderscore event}
+	\textsc{Results}
+	\includegraphics[top=-1,width=\textwidth]{img/MatchStream-3.png}
+\end{frame}
+\begin{frame}{Stage 3.3}{gen\textunderscore server}
 	\begin{description}
 		\item<+->[Call Timeouts]\ \\
 			Remember \texttt{gen\textunderscore server:reply/2}
@@ -329,7 +258,17 @@ I'M HERE
 			Use $0$ timeout
 	\end{description}
 \end{frame}
-\begin{frame}{supervisors}
+\begin{frame}{Stage 3.3}{gen\textunderscore server}
+	\textsc{System Architecture}
+	\begin{center}
+		\includegraphics[height=.75\textheight]{img/running-late.png}
+	\end{center}
+\end{frame}
+\begin{frame}{Stage 3.3}{gen\textunderscore server}
+	\textsc{Results}
+	\includegraphics[top=-1,width=\textwidth]{img/MatchStream-3.png}
+\end{frame}
+\begin{frame}{Stage 3.4}{supervisors}
 	\begin{itemize}
 		\item Sometimes \texttt{simple\textunderscore one\textunderscore for\textunderscore one} supervisors get \alert{overburdened} because they have too many children
 		\item Try a supervisor hierarchy with several managers below the main supervisor
@@ -337,8 +276,19 @@ I'M HERE
 		\startchild
 	\end{itemize}
 \end{frame}
-\subsection{Other Stuff}
-\begin{frame}{Other Processes}
+\begin{frame}{Stage 3.4}{supervisors}
+	\textsc{System Architecture}
+	\begin{center}
+		\includegraphics[height=.75\textheight]{img/running-late.png}
+	\end{center}
+\end{frame}
+\begin{frame}{Stage 3.4}{supervisors}
+	\textsc{Results}
+	\includegraphics[top=-1,width=\textwidth]{img/MatchStream-3.png}
+\end{frame}
+
+\subsubsection{Other Stuff}
+\begin{frame}{Stage 3.5}{Other Processes}
 	\begin{description}
 		\item<+->[Timers]\ \\
 			\begin{itemize}
@@ -357,6 +307,40 @@ I'M HERE
 			\end{itemize}
 	\end{description}
 \end{frame}
+\begin{frame}{Stage 3.5}{Other Processes}
+	\textsc{System Architecture}
+	\begin{center}
+		\includegraphics[height=.75\textheight]{img/running-late.png}
+	\end{center}
+\end{frame}
+\begin{frame}{Stage 3.5}{Other Processes}
+	\textsc{Results}
+	\includegraphics[top=-1,width=\textwidth]{img/MatchStream-3.png}
+\end{frame}
+
+\subsection{Stage 4: Multi-Node Tuning}
+\begin{frame}{Stage 4}{Adding Nodes}
+	\textsc{Goals}
+	\begin{itemize}
+		\item Find the best system topology
+	\end{itemize}
+	\pause
+	\textsc{Steps}
+	\begin{itemize}
+		\item Prepare the system to run in more than one node
+		\item Decide if nodes should be connected or independent
+		\item Decide if nodes should be on the same machine or not
+	\end{itemize}
+\end{frame}
+\begin{frame}{Stage 4}{Adding Nodes}
+	\begin{center}
+		\includegraphics[height=.75\textheight]{img/running-late.png}
+	\end{center}
+\end{frame}
+\begin{frame}{Stage 4}{Adding Nodes}
+	\textsc{Results}
+	\includegraphics[top=-1,width=\textwidth]{img/MatchStream-4.png}
+\end{frame}
 
 \section{Final Words}
 \subsection{Summary}
@@ -371,7 +355,7 @@ I'M HERE
 \subsection{What's next?}
 \begin{frame}{Scaling Topics}{that weren't covered on this presentation}
 	\begin{itemize}
-		\item Adding nodes
+		\item Managing many nodes
 		\item Choosing databases
 		\item System specific improvements
 		\item Measuring tools
