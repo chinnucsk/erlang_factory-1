@@ -36,28 +36,31 @@
 
 \frame{\titlepage} 
 
-\begin{frame}
-	\frametitle{Hello World!}
+\begin{frame}{Hello World!}
 	\begin{itemize}
 		\item<+-> I'm a developer since I was 10
 		\item<+-> I'm an Erlang developer since 2008
-		\item<+-> I've worked in several dynamic web servers
+	\end{itemize}
+	\only<1>{
+		\begin{center}
+			\includegraphics[width=.75\textwidth]{img/Gorillas.png}
+		\end{center}
+	}
+	\only<2>{
+		\begin{center}
+			\includegraphics[width=.75\textwidth]{img/ErlangASCIIArt.png}
+		\end{center}
+	}
+\end{frame}
+\begin{frame}{Hello World!}
+	\begin{itemize}
+		\item<+-> I've built several dynamic web servers
 			\begin{itemize}
 				\item<+-> Many of them with real-time updates
 				\item<+-> Most of them with high scale requirements
 			\end{itemize}
 		\item<+-> I'll show you how I make them scale
 	\end{itemize}
-	\only<1>{
-		\begin{center}
-			\includegraphics[width=.65\textwidth]{img/Gorillas.png}
-		\end{center}
-	}
-	\only<2>{
-		\begin{center}
-			\includegraphics[width=.65\textwidth]{img/ErlangASCIIArt.png}
-		\end{center}
-	}
 \end{frame}
 
 \section{Introduction}
@@ -90,8 +93,19 @@
 
 \section{Match Stream}
 \subsection{Idea}
-\begin{frame}{Match Stream}
-	TODO: General system design graph
+\begin{frame}[t]{Match Stream}{General Idea}
+	\only<1>{
+		\emph{A soccer match is played at some stadium}
+		\includegraphics[width=\textwidth]{img/overview-1.png}}
+	\only<2>{
+		\emph{Soccer fans are connected to the internet in their offices}
+		\includegraphics[width=\textwidth]{img/overview-2.png}}
+	\only<3>{
+		\emph{A reporter is at the stadium with his device}
+		\includegraphics[width=\textwidth]{img/overview-3.png}}
+	\only<4>{
+		\emph{\textsc{MatchStream} \textbf{connects} them in \textbf{real time}}
+		\includegraphics[width=\textwidth]{img/overview-4.png}}
 \end{frame}
 \begin{frame}{Match Stream}{Requirements}
 	\textsc{System Challenges}
