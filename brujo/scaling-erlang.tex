@@ -170,9 +170,17 @@
 		\item Have a human trying the system himself
 	\end{itemize}
 \end{frame}
-\begin{frame}{Stage 1}{Testing the system as it is}
-	\textsc{Results}
-	\includegraphics[top=-1,width=\textwidth]{img/MatchStream-1.png}
+\begin{frame}{Stage 1}{Results}
+	\begin{columns}
+		\column{.66\textwidth}
+			\includegraphics[top=-1,width=\textwidth]{img/MatchStream-1.png}
+		\column{.33\textwidth}
+			\begin{itemize}
+				\item \textbf{\Large 1024} users
+				\item \textbf{\Large 4} at a time
+				\item \textbf{\Large 10s} ART
+			\end{itemize}
+	\end{columns}
 \end{frame}
 
 \subsection{Stage 2: OS Tuning}
@@ -191,9 +199,17 @@
 		\item<+-> Erlang VM startup parameters
 	\end{itemize}
 \end{frame}
-\begin{frame}{Stage 2}{Improving the Environment}
-	\textsc{Results}
-	\includegraphics[top=-1,width=\textwidth]{img/MatchStream-2.png}
+\begin{frame}{Stage 2}{Results}
+	\begin{columns}
+		\column{.66\textwidth}
+			\includegraphics[top=-1,width=\textwidth]{img/MatchStream-2.png}
+		\column{.33\textwidth}
+			\begin{itemize}
+				\item \textbf{\Large 4096} users
+				\item \textbf{\Large 4} at a time
+				\item \textbf{\Large 9s} ART
+			\end{itemize}
+	\end{columns}
 \end{frame}
 
 \subsection{Stage 3: Erlang Tuning}
@@ -233,9 +249,17 @@
 		\includegraphics[height=.75\textheight]{img/running-late.png}
 	\end{center}
 \end{frame}
-\begin{frame}{Stage 3.1}{Connection Tweaks}
-	\textsc{Results}
-	\includegraphics[top=-1,width=\textwidth]{img/MatchStream-3.png}
+\begin{frame}{Stage 3.1}{Results}
+	\begin{columns}
+		\column{.66\textwidth}
+			\includegraphics[top=-1,width=\textwidth]{img/MatchStream-3.png}
+		\column{.33\textwidth}
+			\begin{itemize}
+				\item \textbf{\Large 8192} users
+				\item \textbf{\Large 256} at a time
+				\item \textbf{\Large 16s} ART
+			\end{itemize}
+	\end{columns}
 \end{frame}
 
 \subsubsection{OTP}
@@ -258,9 +282,17 @@
 		\includegraphics[height=.75\textheight]{img/running-late.png}
 	\end{center}
 \end{frame}
-\begin{frame}{Stage 3.2}{gen\textunderscore event}
-	\textsc{Results}
-	\includegraphics[top=-1,width=\textwidth]{img/MatchStream-3.png}
+\begin{frame}{Stage 3.2}{Results}
+	\begin{columns}
+		\column{.66\textwidth}
+			\includegraphics[top=-1,width=\textwidth]{img/MatchStream-3.png}
+		\column{.33\textwidth}
+			\begin{itemize}
+				\item \textbf{\Large 8192} users
+				\item \textbf{\Large 256} at a time
+				\item \textbf{\Large 8s} ART
+			\end{itemize}
+	\end{columns}
 \end{frame}
 \begin{frame}{Stage 3.3}{gen\textunderscore server}
 	\begin{description}
@@ -278,9 +310,17 @@
 		\includegraphics[height=.75\textheight]{img/running-late.png}
 	\end{center}
 \end{frame}
-\begin{frame}{Stage 3.3}{gen\textunderscore server}
-	\textsc{Results}
-	\includegraphics[top=-1,width=\textwidth]{img/MatchStream-3.png}
+\begin{frame}{Stage 3.3}{Results}
+	\begin{columns}
+		\column{.66\textwidth}
+			\includegraphics[top=-1,width=\textwidth]{img/MatchStream-3.png}
+		\column{.33\textwidth}
+			\begin{itemize}
+				\item \textbf{\Large 32768} users
+				\item \textbf{\Large 1024} at a time
+				\item \textbf{\Large 1s} ART
+			\end{itemize}
+	\end{columns}
 \end{frame}
 \begin{frame}{Stage 3.4}{supervisors}
 	\begin{itemize}
@@ -296,9 +336,17 @@
 		\includegraphics[height=.75\textheight]{img/running-late.png}
 	\end{center}
 \end{frame}
-\begin{frame}{Stage 3.4}{supervisors}
-	\textsc{Results}
-	\includegraphics[top=-1,width=\textwidth]{img/MatchStream-3.png}
+\begin{frame}{Stage 3.4}{Results}
+	\begin{columns}
+		\column{.66\textwidth}
+			\includegraphics[top=-1,width=\textwidth]{img/MatchStream-3.png}
+		\column{.33\textwidth}
+			\begin{itemize}
+				\item \textbf{\Large 65536} users
+				\item \textbf{\Large 2048} at a time
+				\item \textbf{\Large 1s} ART
+			\end{itemize}
+	\end{columns}
 \end{frame}
 
 \subsubsection{Other Stuff}
@@ -327,9 +375,17 @@
 		\includegraphics[height=.75\textheight]{img/running-late.png}
 	\end{center}
 \end{frame}
-\begin{frame}{Stage 3.5}{Other Processes}
-	\textsc{Results}
-	\includegraphics[top=-1,width=\textwidth]{img/MatchStream-3.png}
+\begin{frame}{Stage 3.5}{Results}
+	\begin{columns}
+		\column{.66\textwidth}
+			\includegraphics[top=-1,width=\textwidth]{img/MatchStream-3.png}
+		\column{.33\textwidth}
+			\begin{itemize}
+				\item \textbf{\Large 65536} users
+				\item \textbf{\Large 8192} at a time
+				\item \textbf{\Large 10ms} ART
+			\end{itemize}
+	\end{columns}
 \end{frame}
 
 \subsection{Stage 4: Multi-Node Tuning}
@@ -352,9 +408,17 @@
 		\includegraphics[height=.75\textheight]{img/running-late.png}
 	\end{center}
 \end{frame}
-\begin{frame}{Stage 4}{Adding Nodes}
-	\textsc{Results}
-	\includegraphics[top=-1,width=\textwidth]{img/MatchStream-4.png}
+\begin{frame}{Stage 4}{Results}
+	\begin{columns}
+		\column{.66\textwidth}
+			\includegraphics[top=-1,width=\textwidth]{img/MatchStream-4.png}
+		\column{.33\textwidth}
+			\begin{itemize}
+				\item \textbf{\Large 100K} users
+				\item \textbf{\Large 32768} at a time
+				\item \textbf{\Large 10ms} ART
+			\end{itemize}
+	\end{columns}
 \end{frame}
 
 \section{Final Words}
