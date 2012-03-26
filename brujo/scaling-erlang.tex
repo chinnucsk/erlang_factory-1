@@ -6,6 +6,14 @@
 \usecolortheme{whale}
 \usefonttheme[onlylarge]{structuresmallcapsserif}
 \usefonttheme[onlysmall]{structurebold}
+\usepackage{amsthm} % pushQED, popQED
+\newenvironment{aquote}[1]{%
+  \pushQED{#1}%
+  \begin{quote}
+}{%
+  \par\noindent\hfill(\popQED)%
+  \end{quote}%
+}
 
 \setbeamercovered{dynamic}
 \setbeameroption{show notes}
@@ -40,9 +48,26 @@
 
 \defverbatim[colored]\startchild{%
 \begin{lstlisting}[frame=single]
-      supervisor:start_child(
-      	list_to_atom("module-name_" ++
-				integer_to_list(random:uniform(#ofSupervisors))).
+start_user(User) ->
+  Manager =
+    list_to_atom(
+      "user-manager-" ++
+        integer_to_list($\colorbox{yellow}{\texttt{random:uniform(?MANAGERS)}}$)),
+  supervisor:start_child(Manager, [User]).
+\end{lstlisting}
+}
+\defverbatim[colored]\startchildinit{%
+\begin{lstlisting}[frame=single]
+init([]) ->
+  _ = random:seed(erlang:now()),
+  Managers =
+    [{list_to_atom("user-manager-" ++
+                     integer_to_list(I)),
+      $\colorbox{yellow}{\texttt{\{user\_mgr, start\_link, [I]\}}}$,
+      permanent, brutal_kill, supervisor,
+      [user_mgr]}
+     || I <- $\colorbox{yellow}{\texttt{lists:seq(1, ?MANAGERS)}}$],
+  {ok, {{one_for_one, 5, 10}, Managers}}.
 \end{lstlisting}
 }
 
@@ -103,6 +128,90 @@ $\large \ldots$
       [client_listener]}
      || I <- $\colorbox{yellow}{\texttt{lists:seq(MinPort, MaxPort)}}$],
   {ok, {{one_for_one, 5, 10}, Listeners}}.
+\end{lstlisting}
+}
+
+\defverbatim[colored]\suphandler{%
+\begin{lstlisting}[frame=single]
+EvtMgr =
+  match_stream_match:event_manager(MatchId),
+ok =
+  gen_event:add_handler(EvtMgr,
+    {?MODULE, {MatchId,UserId,Client}}, self()),
+$\colorbox{yellow}{\texttt{MgrRef = erlang:monitor(process, EvtMgr)}}$,
+ClientRef = erlang:monitor(process, Client),
+{reply, ok,
+ State#state{matches =
+  [{Client, MatchId, ClientRef, MatchRef}
+   | State#state.matches]}}
+\end{lstlisting}
+}
+\defverbatim[colored]\suphandlerinfo{%
+\begin{lstlisting}[frame=single]
+handle_info({'DOWN',Ref,_,Client,_}, State) ->
+$\large \ldots$
+  case $\colorbox{yellow}{\texttt{lists:keytake(Ref, 4, State\#state.matches)}}$ of
+    {value, {Client,_,CRef,Ref}, OtherMatches} ->
+      $\large \ldots$
+\end{lstlisting}
+}
+
+\defverbatim[colored]\repeater{%
+\begin{lstlisting}[frame=single]
+start_link(Name, Source) ->
+  {ok, Pid} = gen_event:start_link(Name),
+  ok = gen_event:add_handler(
+         Source, {?MODULE, Pid}, Pid),
+  {ok, Pid}.
+  $\ldots$
+init(Repeater) ->
+  Ref = erlang:monitor(process, Repeater),
+  {ok, #state{mgr = Repeater, ref = Ref}}.
+  $\ldots$
+handle_event(Event, State) ->
+  gen_event:notify(State#state.mgr, Event),
+  {ok, State}.
+\end{lstlisting}
+}
+
+\defverbatim[colored]\reply{%
+\begin{lstlisting}[frame=single]
+handle_call(Request, From, State) ->
+  [RedisConn|Redis] = State#state.redis,
+  proc_lib:spawn_link(
+    fun() ->
+      Res = handle_call(Request, RedisConn),
+      $\colorbox{yellow}{\texttt{gen\_server:reply(From, Res)}}$
+    end),
+  {$\colorbox{yellow}{\texttt{noreply}}$, State#state{redis =
+                          Redis ++ [RedisConn]}}.
+\end{lstlisting}
+}
+
+\defverbatim[colored]\hibernate{%
+\begin{lstlisting}[frame=single]
+handle_cast(Event, State) ->
+  $\large \ldots$
+  {noreply, State, $\colorbox{yellow}{\texttt{hibernate}}$}.
+
+$\large \ldots$
+
+handle_call(Request, _From, State) ->
+  $\large \ldots$
+  {reply, Reply, State, $\colorbox{yellow}{\texttt{hibernate}}$}.
+\end{lstlisting}
+}
+
+\defverbatim[colored]\init{%
+\begin{lstlisting}[frame=single]
+init(UserId) ->
+  {ok, #state{user = UserId}, $\colorbox{yellow}{\texttt{0}}$}.
+  
+$\large \ldots$
+
+handle_info($\colorbox{yellow}{\texttt{timeout}}$, State) ->
+  case match_stream_db:user(State#state.user) of
+  $\large \ldots$
 \end{lstlisting}
 }
 
@@ -337,7 +446,7 @@ $\large \ldots$
 	\end{columns}
 \end{frame}
 
-\subsection{Stage 2: Erlang Tune}
+\subsection{Stage 2: Tune the Code}
 \begin{frame}{Stage 2}{Improving Match Stream}
 	\begin{center}
 		\Large We can't blame the machine anymore, we need to improve \alert{our system}
@@ -384,14 +493,24 @@ $\large \ldots$
 	\end{description}
 \end{frame}
 \begin{frame}{Stage 2.1}{Connection Tweaks}
-\only<1>{\listener}
-\only<2>{\dbcall}
+\listener
 \end{frame}
 \begin{frame}{Stage 2.1}{Connection Tweaks}
-	\textsc{System Architecture}
-	\begin{center}
-		\includegraphics[height=.7\textheight]{img/architecture-2.png}
-	\end{center}
+	\begin{columns}
+		\column{.5\textwidth}
+			\begin{center}
+				\includegraphics[height=.7\textheight]{img/architecture-2.png}
+			\end{center}
+		\column{.5\textwidth}
+			\begin{description}
+				\item[listener]
+					\texttt{gen\_server}. Listens on a TCP port to receive client connections
+				\item[web]
+					\texttt{mochiweb server}. Listens for HTTP API calls on a particular port
+				\item[connection]
+					\texttt{erldis client}. Handles the connection to the database
+			\end{description}
+	\end{columns}
 \end{frame}
 \begin{frame}{Stage 2.1}{Results}
 	\begin{columns}
@@ -414,17 +533,36 @@ $\large \ldots$
 				\item Don't use it
 				\item Monitor the processes instead
 			\end{itemize}
+	\end{description}
+\end{frame}
+\begin{frame}{Stage 2.2}{gen\textunderscore event}
+	\only<1>{\suphandler}
+	\only<2>{\suphandlerinfo}
+\end{frame}
+\begin{frame}{Stage 2.2}{gen\textunderscore event}
+	\begin{description}
 		\item<+->[Long Delivery Queues]\ \\
 			\begin{itemize}
+				\item Distribute the work
 				\item Use \emph{repeaters}
 			\end{itemize}
 	\end{description}
 \end{frame}
 \begin{frame}{Stage 2.2}{gen\textunderscore event}
-	\textsc{System Architecture}
-	\begin{center}
-		\includegraphics[height=.75\textheight]{img/running-late.png}
-	\end{center}
+\repeater
+\end{frame}
+\begin{frame}{Stage 2.2}{gen\textunderscore event}
+	\begin{columns}
+		\column{.5\textwidth}
+			\begin{center}
+				\includegraphics[height=.75\textheight]{img/architecture-3-2.png}
+			\end{center}
+		\column{.5\textwidth}
+			\begin{description}
+				\item[repeater]
+					\texttt{gen\_event dispatcher}. It's subscribed to \texttt{dispatcher} and \emph{repeats} the received events to its subscribers
+			\end{description}
+	\end{columns}
 \end{frame}
 \begin{frame}{Stage 2.2}{Results}
 	\begin{columns}
@@ -432,9 +570,9 @@ $\large \ldots$
 			\includegraphics[top=-1,width=\textwidth]{img/results-3-2.png}
 		\column{.33\textwidth}
 			\begin{itemize}
-				\item \textbf{\Large 8192} users
-				\item \textbf{\Large 256} at a time
-				\item \textbf{\Large 8s} ART
+				\item[N] \textbf{\Large 8000}
+				\item[C] \textbf{\Large 500}
+				\item[ART] \textbf{\Large 8s}
 			\end{itemize}
 	\end{columns}
 \end{frame}
@@ -442,43 +580,74 @@ $\large \ldots$
 	\begin{description}
 		\item<+->[Call Timeouts]\ \\
 			Remember \texttt{gen\textunderscore server:reply/2}
-		\item<+->[Memory Footprint]\ \\
-			Remember \texttt{hibernate}
-		\item<+->[Long \texttt{init/1}]\ \\
-			Use $0$ timeout
 	\end{description}
 \end{frame}
 \begin{frame}{Stage 2.3}{gen\textunderscore server}
-	\textsc{System Architecture}
-	\begin{center}
-		\includegraphics[height=.75\textheight]{img/running-late.png}
-	\end{center}
+\reply
+\end{frame}
+\begin{frame}{Stage 2.3}{gen\textunderscore server}
+	\begin{description}
+		\item<+->[Memory Footprint]\ \\
+			Remember \texttt{hibernate}~\\
+	\end{description}
+	\begin{aquote}{Erlang Docs}
+		Puts the calling process into a wait state where its memory allocation has been reduced as much as possible, which is useful if the process does not expect to receive any messages in the near future.
+	\end{aquote}
+\end{frame}
+\begin{frame}{Stage 2.3}{gen\textunderscore server}
+\hibernate
+\end{frame}
+\begin{frame}{Stage 2.3}{gen\textunderscore server}
+	\begin{description}
+		\item<+->[Long startup time]\ \\
+			\begin{itemize}
+				\item Initialize your gen\textunderscore servers in a $0$ timeout
+				\item Move initialization code to \texttt{handle\_info}
+			\end{itemize}
+	\end{description}
+\end{frame}
+\begin{frame}{Stage 2.3}{gen\textunderscore server}
+\init
 \end{frame}
 \begin{frame}{Stage 2.3}{Results}
 	\begin{columns}
 		\column{.66\textwidth}
-			\includegraphics[top=-1,width=\textwidth]{img/results-3-3.png}
+			\includegraphics[top=-1,width=\textwidth]{img/results-1.png}
 		\column{.33\textwidth}
-			\begin{itemize}
-				\item \textbf{\Large 32768} users
-				\item \textbf{\Large 1024} at a time
-				\item \textbf{\Large 1s} ART
-			\end{itemize}
+			\begin{description}
+				\item[N] \textbf{\Large 32K}
+				\item[C] \textbf{\Large 2000}
+				\item[ART] \textbf{\Large 1s}
+			\end{description}
 	\end{columns}
 \end{frame}
 \begin{frame}{Stage 2.4}{supervisors}
-	\begin{itemize}
-		\item Sometimes \texttt{simple\textunderscore one\textunderscore for\textunderscore one} supervisors get \alert{overburdened} because they have too many children
-		\item Try a supervisor hierarchy with several managers below the main supervisor
-		\item Turn \texttt{supervisor:start\textunderscore child/2} calls into something like
-		\startchild
-	\end{itemize}
+	\begin{description}
+		\item<+->[Simple One for Ones]\ \\
+			\begin{itemize}
+				\item Sometimes \texttt{simple\textunderscore one\textunderscore for\textunderscore one} supervisors get \alert{overburdened} because they have too many children
+				\item Use a supervisor hierarchy
+			\end{itemize}
+	\end{description}
 \end{frame}
 \begin{frame}{Stage 2.4}{supervisors}
-	\textsc{System Architecture}
-	\begin{center}
-		\includegraphics[height=.75\textheight]{img/running-late.png}
-	\end{center}
+\only<1>{\startchildinit}
+\only<2>{\startchild}
+\end{frame}
+\begin{frame}{Stage 2.4}{supervisors}
+	\begin{columns}
+		\column{.5\textwidth}
+			\begin{center}
+				\includegraphics[height=.65\textheight]{img/architecture-3-4.png}
+			\end{center}
+		\column{.5\textwidth}
+			\begin{description}
+				\item[user\_mgr]
+					\texttt{supervisor}. Supervises a group of users processes
+				\item[client\_mgr]
+					\texttt{supervisor}. Supervises a group of connection processes
+			\end{description}
+	\end{columns}
 \end{frame}
 \begin{frame}{Stage 2.4}{Results}
 	\begin{columns}
@@ -496,11 +665,6 @@ $\large \ldots$
 \subsubsection{Other Stuff}
 \begin{frame}{Stage 2.5}{Other Processes}
 	\begin{description}
-		\item<+->[Timers]\ \\
-			\begin{itemize}
-				\item Don't use the \texttt{timer} module
-				\item Use \texttt{erlang:send\textunderscore after}
-			\end{itemize}
 		\item<+->[Logging]\ \\
 			\begin{itemize}
 				\item Don't log too much
