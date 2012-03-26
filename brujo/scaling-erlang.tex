@@ -18,14 +18,26 @@
 \date{\today}
 \logo{\includegraphics[height=0.5cm]{img/inaka_leaf_logo.png}}
 
-\lstset{% general command to set parameter(s)
-		basicstyle=\ttfamily\tiny, % print whole listing small
-		keywordstyle=\color{black}\bfseries,
-		identifierstyle=, % nothing happens
-		stringstyle=\ttfamily, % typewriter type for strings
-		showstringspaces=false} % no special string spaces
+\newcommand*\oldmacro{}%
+\let\oldmacro\insertshorttitle%
+\renewcommand*\insertshorttitle{%
+  \oldmacro\hfill%
+  \insertframenumber\,/\,\inserttotalframenumber}
 
-\lstset{language=erlang}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% CODE SNIPPETS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\definecolor{darkblue}{rgb}{0,0.08,0.45} 
+
+\lstset{% general command to set parameter(s)
+		mathescape=true,
+		language=erlang,
+		basicstyle=\ttfamily\small,
+		keywordstyle=\color{blue}\bfseries,
+		identifierstyle=\color{darkblue},
+		stringstyle=\ttfamily,
+		showstringspaces=false}
+
 \defverbatim[colored]\startchild{%
 \begin{lstlisting}[frame=single]
       supervisor:start_child(
@@ -34,50 +46,98 @@
 \end{lstlisting}
 }
 
+\defverbatim[colored]\backlog{%
+\begin{lstlisting}[frame=single]
+gen_tcp:listen(Port,
+  [binary, {packet, line}, {keepalive, true},
+   {active, false}, {reuseaddr, true},
+   $\colorbox{yellow}{\texttt{\{backlog, 128000\}}}$, {send_timeout, 32000},
+   {send_timeout_close, true}]).
+\end{lstlisting}
+}
+\defverbatim[colored]\backlogweb{%
+\begin{lstlisting}[frame=single]
+mochiweb_http:start(
+  [{name, ?MODULE}, {loop, {?MODULE, loop}},
+   $\colorbox{yellow}{\texttt{\{backlog, 128000\}}}$, {port, Port}]).
+\end{lstlisting}
+}
+\defverbatim[colored]\db{%
+\begin{lstlisting}[frame=single]
+-define(REDIS_CONNECTIONS, 200).
+-record(state, {redis :: $\colorbox{yellow}{\texttt{[pid()]}}$}).
+$\large \ldots$
+Redis =
+  lists:map(
+    fun(_) ->
+      {ok, Conn} = erldis_client:start_link()
+      Conn
+    end, $\colorbox{yellow}{\texttt{lists:seq(1, ?REDIS\_CONNECTIONS)}}$),
+{ok, #state{redis = Redis}}.
+\end{lstlisting}
+}
+
+\defverbatim[colored]\dbcall{%
+\begin{lstlisting}[frame=single]
+handle_call(Request, From, State) ->
+  $\colorbox{yellow}{\texttt{[RedisConn|Redis] = State\#state.redis}}$,
+  proc_lib:spawn_link(
+    fun() ->
+      Res = handle_call(Request, RedisConn),
+      gen_server:reply(From, Res)
+    end),
+  {noreply, State#state{redis =
+                          $\colorbox{yellow}{\texttt{Redis ++ [RedisConn]}}$}}.
+\end{lstlisting}
+}
+
+\defverbatim[colored]\listener{%
+\begin{lstlisting}[frame=single]
+init([]) ->
+$\large \ldots$
+  Listeners =
+    [{list_to_atom("client-listener-" ++
+                     integer_to_list(I)),
+      $\colorbox{yellow}{\texttt{{client\_listener, start\_link, [\textbf{I}]}}}$,
+      permanent, brutal_kill, worker,
+      [client_listener]}
+     || I <- $\colorbox{yellow}{\texttt{lists:seq(MinPort, MaxPort)}}$],
+  {ok, {{one_for_one, 5, 10}, Listeners}}.
+\end{lstlisting}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \frame{\titlepage} 
 
 \begin{frame}{Hello World!}
 	\begin{itemize}
 		\item<+-> I'm a developer since I was 10
-		\item<+-> I'm an Erlang developer since 2008
+		\item<+-> I worked with Visual Basic, C\#, .NET, Javascript \ldots
+		\item<+-> I switched to functional programming in 2008
+		\item<+-> I wrote my thesis project in Haskell
+		\item<+-> I'm an Erlang developer since then
 	\end{itemize}
-	\only<1>{
-		\begin{center}
-			\includegraphics[width=.75\textwidth]{img/Gorillas.png}
-		\end{center}
-	}
-	\only<2>{
-		\begin{center}
-			\includegraphics[width=.75\textwidth]{img/ErlangASCIIArt.png}
-		\end{center}
-	}
 \end{frame}
-\begin{frame}{Hello World!}
-	\begin{itemize}
-		\item<+-> I've built several dynamic web servers
-			\begin{itemize}
-				\item<+-> Many of them with real-time updates
-				\item<+-> Most of them with high scale requirements
-			\end{itemize}
-		\item<+-> I'll show you how I make them scale
-	\end{itemize}
+\begin{frame}{Inaka}
+	
 \end{frame}
 
 \section{Introduction}
 \subsection{Description}
 \begin{frame}{Introduction}
-	We will work on the scalability of a \emph{web} project \pause that has an \emph{HTTP API} \pause and a component that keeps clients \emph{connected} to the server \pause for \emph{long periods} of time.\\
-\pause Examples:
+	My talk is on the scalability of a \emph{web} project \pause that has an \emph{HTTP API} \pause and a component that keeps clients \emph{connected} to the server for \emph{long periods} of time.\\ ~ \\ \pause
+	It's a design pattern seen in many places:
 	\begin{itemize}
-		\item<+-> Social sites
-		\item<+-> Chat sites
-		\item<+-> Sports sites
+		\item Chat Applications
+		\item Social Sites
+		\item Sport Sites
 	\end{itemize}
 \end{frame}
 
 \subsection{Scope}
 \begin{frame}{Scope}
-	\emph{We will try to improve the way we use}
+	\emph{We will improve the way we use}
 	\begin{itemize}
 		\item OTP behaviours
 		\item TCP and HTTP connections
@@ -110,7 +170,7 @@
 \begin{frame}{Match Stream}{Requirements}
 	\textsc{System Challenges}
 	\begin{itemize}
-		\item<+-> Tons of concurrent users
+		\item<+-> Many concurrent users connecting at the same time
 		\item<+-> Two-hour-long bursts of connections followed by long periods of inactivity
 		\item<+-> Real-time updates
 	\end{itemize}
@@ -122,79 +182,105 @@
 	\includegraphics[width=\textwidth]{img/MatchStream.png}
 \end{frame}
 \begin{frame}[t]{Match Stream}{Architecture}
-	\only<1>{
-		\begin{center}
-			\includegraphics[width=\textwidth]{img/architecture-1.png}
-		\end{center}}
-	\only<2>{
-		\begin{center}
-			\includegraphics[width=\textwidth]{img/architecture-1-1.png}
-		\end{center}
-		\begin{description}
-			\item[client\_listener]
-				\texttt{gen\_server}. Listens on a TCP port to receive client connections
+	\begin{center}
+		\includegraphics[width=\textwidth]{img/architecture-1.png}
+	\end{center}
+\end{frame}
+\begin{frame}{Components}
+	\begin{columns}
+		\column{.5\textwidth}
+			\only<1>{
+				\begin{center}
+					\includegraphics[width=\textwidth]{img/architecture-1-1.png}
+				\end{center}}
+			\only<2>{
+				\begin{center}
+					\includegraphics[width=\textwidth]{img/architecture-1-2.png}
+				\end{center}}
+			\only<3>{
+				\begin{center}
+					\includegraphics[width=.75\textwidth]{img/architecture-1-3.png}
+				\end{center}}
+			\only<4>{
+				\begin{center}
+					\includegraphics[width=\textwidth]{img/architecture-1-4.png}
+				\end{center}}
+			\only<5>{
+				\begin{center}
+					\includegraphics[width=\textwidth]{img/architecture-1-5.png}
+				\end{center}}
+			\only<6>{
+				\begin{center}
+					\includegraphics[width=\textwidth]{img/architecture-1-6.png}
+				\end{center}}
+		\column{.5\textwidth}
+			\only<1>{
+				\begin{description}
+					\item[client\_listener]
+						\texttt{gen\_server}. Listens on a TCP port to receive client connections
+					\end{description}}
+			\only<2>{
+				\begin{description}
+					\item[client\_sup]
+						\texttt{supervisor}. Supervises connection processes
+					\item[client]
+						\texttt{gen\_fsm}. \\ Handles a TCP connection
+				\end{description}}
+			\only<3>{
+				\begin{description}
+					\item[web]
+						\texttt{mochiweb server}. Listens for HTTP API calls
+				\end{description}}
+			\only<4>{
+				\begin{description}
+					\item[user\_sup]
+						\texttt{supervisor}. Supervises user processes
+					\item[user]
+						\texttt{gen\_server}. Subscribes to match dispatchers and sends events to clients
+				\end{description}}
+			\only<5>{
+				\begin{description}
+					\item[match\_sup]
+						\texttt{supervisor}. Supervises match processes
+					\item[match]
+						\texttt{gen\_server}. Listens to match events, stores them
+					\item[dispatcher]
+						\texttt{gen\_event dispatcher}. Delivers match events
+				\end{description}}
+			\only<6>{
+				\begin{description}
+					\item[db]
+						\texttt{gen\_server}. Processes database operations
+					\item[connection]
+						\texttt{erldis client}. Handles the connection to the database
 		\end{description}}
-	\only<3>{
-		\begin{center}
-			\includegraphics[width=\textwidth]{img/architecture-1-2.png}
-		\end{center}
-		\begin{description}
-			\item[client\_sup]
-				\texttt{supervisor}. Supervises connection processes
-			\item[client]
-				\texttt{gen\_fsm}. Handles a TCP connection
-		\end{description}}
-	\only<4>{
-		\begin{center}
-			\includegraphics[width=\textwidth]{img/architecture-1-3.png}
-		\end{center}
-		\begin{description}
-			\item[web]
-				\texttt{mochiweb server}. Listens for HTTP API calls
-		\end{description}}
-	\only<5>{
-		\begin{center}
-			\includegraphics[width=\textwidth]{img/architecture-1-4.png}
-		\end{center}
-		\begin{description}
-			\item[user\_sup]
-				\texttt{supervisor}. Supervises user processes
-			\item[user]
-				\texttt{gen\_server}. Subscribes to match dispatchers and sends events to clients
-		\end{description}}
-	\only<6>{
-		\begin{center}
-			\includegraphics[width=\textwidth]{img/architecture-1-5.png}
-		\end{center}
-		\begin{description}
-			\item[match\_sup]
-				\texttt{supervisor}. Supervises match processes
-			\item[match]
-				\texttt{gen\_server}. Listens to match events, stores them
-			\item[dispatcher]
-				\texttt{gen\_event dispatcher}. Delivers match events
-		\end{description}}
-	\only<7>{
-		\begin{center}
-			\includegraphics[width=\textwidth]{img/architecture-1-6.png}
-		\end{center}
-		\begin{description}
-			\item[db]
-				\texttt{gen\_server}. Processes database operations
-			\item[connection]
-				\texttt{erldis client}. Handles the connection to the database
-		\end{description}}
+	\end{columns}
 \end{frame}
 
 \section{Scaling}
 \begin{frame}{Lesson Learned}
 	\begin{center}
-		\huge \emph{Using Erlang to build your system is \textbf{not enough} to ensure \textbf{scalability}}
+		\huge \emph{Simply using Erlang to build your system is \textbf{not enough} to ensure \textbf{scalability}}
 	\end{center}
 \end{frame}
 
-\subsection{Stage 1: The Original System}
-\begin{frame}{Stage 1}{Testing the system as it is}
+\begin{frame}{Measures}
+	\begin{description}
+		\item[N] \emph{Connections}. Number of connections the server can handle
+		\item[C] \emph{Concurrency}. Number of multiple connections starting at a time
+		\item[ART] \emph{Average Response Time}. How much does it take for the server to send an event
+	\end{description}
+\end{frame}
+\begin{frame}{Tools}
+	\begin{description}
+		\item[Test Client]~\\ We create our own test client for TCP connections
+		\item[ApacheBench]~\\ To test API calls
+		\item[entop]~\\ We use it to see what's going on in the server
+	\end{description}
+\end{frame}
+
+\subsection{Stage 0: Baseline}
+\begin{frame}{Stage 0}{Establishing a Baseline}
 	\textsc{Goals}
 	\begin{itemize}
 		\item Find how much the system can handle
@@ -205,7 +291,7 @@
 		\item Create automated testers
 		\item Start the system on a \emph{clean} machine
 		\item Test repeatedly adjusting the number of connections
-		\item Have a human trying the system himself
+		\item Have a human using the system himself
 	\end{itemize}
 \end{frame}
 \begin{frame}{Stage 1}{Results}
@@ -213,95 +299,115 @@
 		\column{.66\textwidth}
 			\includegraphics[top=-1,width=\textwidth]{img/results-1.png}
 		\column{.33\textwidth}
-			\begin{itemize}
-				\item \textbf{\Large 1000} users
-				\item \textbf{\Large 25} at a time
-				\item \textbf{\Large 26s} ART
-			\end{itemize}
+			\begin{description}
+				\item[N] \textbf{\Large 1000}
+				\item[C] \textbf{\Large 5}
+				\item[ART] \textbf{\Large 26s}
+			\end{description}
 	\end{columns}
 \end{frame}
 
-\subsection{Stage 2: OS Tuning}
-\begin{frame}{Stage 2}{Improving the Environment}
+\subsection{Stage 1: OS Tune}
+\begin{frame}{Stage 1}{Tune the OS and the VM}
 	\textsc{Goals}
 	\begin{itemize}
-		\item Improve the system environment without altering the code
+		\item Improve the underlying Operating System
+		\item Improve the Erlang VM Configuration
 	\end{itemize}
 	\pause
 	\textsc{Settings to Tune Up}
 	\begin{itemize}
-		\item<+-> Concurrent TCP connections
 		\item<+-> Open files limit
+		\item<+-> TCP connections limit
 		\item<+-> TCP backlog size
 		\item<+-> TCP memory allocation
-		\item<+-> Erlang VM startup parameters
+		\item<+-> Number of Erlang processes
 	\end{itemize}
 \end{frame}
-\begin{frame}{Stage 2}{Results}
+\begin{frame}{Stage 1}{Results}
 	\begin{columns}
 		\column{.66\textwidth}
-			\includegraphics[top=-1,width=\textwidth]{img/MatchStream-2.png}
+			\includegraphics[top=-1,width=\textwidth]{img/results-2.png}
 		\column{.33\textwidth}
-			\begin{itemize}
-				\item \textbf{\Large 4096} users
-				\item \textbf{\Large 4} at a time
-				\item \textbf{\Large 9s} ART
-			\end{itemize}
+			\begin{description}
+				\item[N] \textbf{\Large 4000}
+				\item[C] \textbf{\Large 5}
+				\item[ART] \textbf{\Large 35s}
+			\end{description}
 	\end{columns}
 \end{frame}
 
-\subsection{Stage 3: Erlang Tuning}
-\begin{frame}{Stage 3}{Improving Match Stream}
-	\textsc{Goals}
-	\begin{itemize}
-		\item Tune up the system for \alert{one node}
-	\end{itemize}
-	\pause
-	\textsc{Steps}
-	\begin{itemize}
-		\item Find a problem
-		\item Fix it using the list of \emph{Tips and Tricks}
-		\item If not there, add it
-		\item Repeat from \alert{Stage 1}
-	\end{itemize}
+\subsection{Stage 2: Erlang Tune}
+\begin{frame}{Stage 2}{Improving Match Stream}
+	\begin{center}
+		\Large We can't blame the machine anymore, we need to improve \alert{our system}
+	\end{center}
 \end{frame}
 
 \subsubsection{TCP Tuning}
-\begin{frame}{Stage 3.1}{Connection Tweaks}
+\begin{frame}{Stage 2.1}{Connection Tweaks}
 	\begin{description}
 		\item<+->[Backlog]\ \\
 			\begin{itemize}
 				\item Allow more concurrent connections
 				\item Don't forget TCP tuning your HTTP server
 			\end{itemize}
-		\item<+->[Connections]\ \\
+	\end{description}
+\end{frame}
+\begin{frame}{Stage 2.1}{Connection Tweaks}
+	\begin{description}
+		\item[client\_listener]~\\\backlog
+		\item[web]~\\\backlogweb
+	\end{description}
+\end{frame}
+\begin{frame}{Stage 2.1}{Connection Tweaks}
+	\begin{description}
+		\item<+->[Outbound Connections]\ \\
 			\begin{itemize}
+				\item For instance, database connections
 				\item Don't use just one of them
-				\item Check inbound and outbound connections
+				\item You may have separated connections for different purposes
 			\end{itemize}
 	\end{description}
 \end{frame}
-\begin{frame}{Stage 3.1}{Connection Tweaks}
+\begin{frame}{Stage 2.1}{Connection Tweaks}
+\only<1>{\db}
+\only<2>{\dbcall}
+\end{frame}
+\begin{frame}{Stage 2.1}{Connection Tweaks}
+	\begin{description}
+		\item<+->[Listeners]\ \\
+			\begin{itemize}
+				\item You can listen to more than one port
+				\item For unified urls, use \emph{nginx} in front of the server
+			\end{itemize}
+	\end{description}
+\end{frame}
+\begin{frame}{Stage 2.1}{Connection Tweaks}
+\only<1>{\listener}
+\only<2>{\dbcall}
+\end{frame}
+\begin{frame}{Stage 2.1}{Connection Tweaks}
 	\textsc{System Architecture}
 	\begin{center}
-		\includegraphics[height=.75\textheight]{img/running-late.png}
+		\includegraphics[height=.7\textheight]{img/architecture-2.png}
 	\end{center}
 \end{frame}
-\begin{frame}{Stage 3.1}{Results}
+\begin{frame}{Stage 2.1}{Results}
 	\begin{columns}
 		\column{.66\textwidth}
-			\includegraphics[top=-1,width=\textwidth]{img/MatchStream-3.png}
+			\includegraphics[top=-1,width=\textwidth]{img/results-3-1.png}
 		\column{.33\textwidth}
-			\begin{itemize}
-				\item \textbf{\Large 8192} users
-				\item \textbf{\Large 256} at a time
-				\item \textbf{\Large 16s} ART
-			\end{itemize}
+			\begin{description}
+				\item[N] \textbf{\Large 8000}
+				\item[C] \textbf{\Large 500}
+				\item[ART] \textbf{\Large 15s}
+			\end{description}
 	\end{columns}
 \end{frame}
 
 \subsubsection{OTP}
-\begin{frame}{Stage 3.2}{gen\textunderscore event}
+\begin{frame}{Stage 2.2}{gen\textunderscore event}
 	\begin{description}
 		\item<+->[sup\textunderscore handler]\ \\
 			\begin{itemize}
@@ -314,16 +420,16 @@
 			\end{itemize}
 	\end{description}
 \end{frame}
-\begin{frame}{Stage 3.2}{gen\textunderscore event}
+\begin{frame}{Stage 2.2}{gen\textunderscore event}
 	\textsc{System Architecture}
 	\begin{center}
 		\includegraphics[height=.75\textheight]{img/running-late.png}
 	\end{center}
 \end{frame}
-\begin{frame}{Stage 3.2}{Results}
+\begin{frame}{Stage 2.2}{Results}
 	\begin{columns}
 		\column{.66\textwidth}
-			\includegraphics[top=-1,width=\textwidth]{img/MatchStream-3.png}
+			\includegraphics[top=-1,width=\textwidth]{img/results-3-2.png}
 		\column{.33\textwidth}
 			\begin{itemize}
 				\item \textbf{\Large 8192} users
@@ -332,7 +438,7 @@
 			\end{itemize}
 	\end{columns}
 \end{frame}
-\begin{frame}{Stage 3.3}{gen\textunderscore server}
+\begin{frame}{Stage 2.3}{gen\textunderscore server}
 	\begin{description}
 		\item<+->[Call Timeouts]\ \\
 			Remember \texttt{gen\textunderscore server:reply/2}
@@ -342,16 +448,16 @@
 			Use $0$ timeout
 	\end{description}
 \end{frame}
-\begin{frame}{Stage 3.3}{gen\textunderscore server}
+\begin{frame}{Stage 2.3}{gen\textunderscore server}
 	\textsc{System Architecture}
 	\begin{center}
 		\includegraphics[height=.75\textheight]{img/running-late.png}
 	\end{center}
 \end{frame}
-\begin{frame}{Stage 3.3}{Results}
+\begin{frame}{Stage 2.3}{Results}
 	\begin{columns}
 		\column{.66\textwidth}
-			\includegraphics[top=-1,width=\textwidth]{img/MatchStream-3.png}
+			\includegraphics[top=-1,width=\textwidth]{img/results-3-3.png}
 		\column{.33\textwidth}
 			\begin{itemize}
 				\item \textbf{\Large 32768} users
@@ -360,7 +466,7 @@
 			\end{itemize}
 	\end{columns}
 \end{frame}
-\begin{frame}{Stage 3.4}{supervisors}
+\begin{frame}{Stage 2.4}{supervisors}
 	\begin{itemize}
 		\item Sometimes \texttt{simple\textunderscore one\textunderscore for\textunderscore one} supervisors get \alert{overburdened} because they have too many children
 		\item Try a supervisor hierarchy with several managers below the main supervisor
@@ -368,16 +474,16 @@
 		\startchild
 	\end{itemize}
 \end{frame}
-\begin{frame}{Stage 3.4}{supervisors}
+\begin{frame}{Stage 2.4}{supervisors}
 	\textsc{System Architecture}
 	\begin{center}
 		\includegraphics[height=.75\textheight]{img/running-late.png}
 	\end{center}
 \end{frame}
-\begin{frame}{Stage 3.4}{Results}
+\begin{frame}{Stage 2.4}{Results}
 	\begin{columns}
 		\column{.66\textwidth}
-			\includegraphics[top=-1,width=\textwidth]{img/MatchStream-3.png}
+			\includegraphics[top=-1,width=\textwidth]{img/results-3-4.png}
 		\column{.33\textwidth}
 			\begin{itemize}
 				\item \textbf{\Large 65536} users
@@ -388,7 +494,7 @@
 \end{frame}
 
 \subsubsection{Other Stuff}
-\begin{frame}{Stage 3.5}{Other Processes}
+\begin{frame}{Stage 2.5}{Other Processes}
 	\begin{description}
 		\item<+->[Timers]\ \\
 			\begin{itemize}
@@ -407,16 +513,16 @@
 			\end{itemize}
 	\end{description}
 \end{frame}
-\begin{frame}{Stage 3.5}{Other Processes}
+\begin{frame}{Stage 2.5}{Other Processes}
 	\textsc{System Architecture}
 	\begin{center}
 		\includegraphics[height=.75\textheight]{img/running-late.png}
 	\end{center}
 \end{frame}
-\begin{frame}{Stage 3.5}{Results}
+\begin{frame}{Stage 2.5}{Results}
 	\begin{columns}
 		\column{.66\textwidth}
-			\includegraphics[top=-1,width=\textwidth]{img/MatchStream-3.png}
+			\includegraphics[top=-1,width=\textwidth]{img/results-3-5.png}
 		\column{.33\textwidth}
 			\begin{itemize}
 				\item \textbf{\Large 65536} users
@@ -426,8 +532,8 @@
 	\end{columns}
 \end{frame}
 
-\subsection{Stage 4: Multi-Node Tuning}
-\begin{frame}{Stage 4}{Adding Nodes}
+\subsection{Stage 3: Multi-Node Tuning}
+\begin{frame}{Stage 3}{Adding Nodes}
 	\textsc{Goals}
 	\begin{itemize}
 		\item Find the best system topology
@@ -440,16 +546,16 @@
 		\item Decide if nodes should be on the same machine or not
 	\end{itemize}
 \end{frame}
-\begin{frame}{Stage 4}{Adding Nodes}
+\begin{frame}{Stage 3}{Adding Nodes}
 	\textsc{System Architecture}
 	\begin{center}
 		\includegraphics[height=.75\textheight]{img/running-late.png}
 	\end{center}
 \end{frame}
-\begin{frame}{Stage 4}{Results}
+\begin{frame}{Stage 3}{Results}
 	\begin{columns}
 		\column{.66\textwidth}
-			\includegraphics[top=-1,width=\textwidth]{img/MatchStream-4.png}
+			\includegraphics[top=-1,width=\textwidth]{img/results-4.png}
 		\column{.33\textwidth}
 			\begin{itemize}
 				\item \textbf{\Large 100K} users
