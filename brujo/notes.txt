@@ -1,0 +1,62 @@
+02. Hello World!
+	-> After a year at Novamens, I moved to Inaka where I work since almost 2 years ago
+03. Inaka
+	-> So, what are we going to talk about today?
+04. Introduction
+	- It's a design pattern we keep seeing everywhere
+	- API is good for integration, Sockets are good for real-time
+	-> And what are we going to do with that sysem?
+05. Scope
+	-> To show you all this process, I created a sample project
+		very very similar to the ones we develop @ Inaka all the time
+06. MS: General Idea
+	-> So, what are the requirements of a system like this one?
+07. MS: Reqs
+	- Erlang seems to be the best language to develop this system with
+	-> Well, let's start by designing it
+08. MS: Design
+	[ Show each element ]
+	-> Let's see how it looks in terms of Erlang processes
+09. MS: Architecture
+	- This is a general view
+	- A regular Erlang application
+	-> Let's see each component in deeper detail
+10. MS: Components
+	- I'm assuming here, you're all familiar with application and main supervisor process so I'll just skip those
+	-> Great! A good design, we used Erlang, we used OTP… what can possibly go wrong, right?
+11. Lesson
+	- Turns out that…
+	-> So, let's see how much can our system scale, right?
+12. Measures
+	-> To get those measures, we will use these tools (and some others)
+13. Tools
+	-> Great! We have our tools, we have our target… let's get started, shall we?
+14. S0: Baseline
+	- Note: we want to test it in its local network to prevent the network itself to intervene in our mesurements, but since we're using a local network we know we should aim for better values than the ones we need
+	-> Now, so we test the system… and what do we find? Millions of users? Hundreds of Thousands of users? Well, actually…
+15. S0: Results
+	- That's NOT a typo: it says 26 SECONDS… in a LOCAL NETWORK
+	-> That's just wrong, man. But the system was correctly designed and implemented, there must be something wrong with the machine where we installed it
+16. S1: OS Tune
+	- Most server OSs are designed to be "general-purpose"… we need to "let them know" what we plan to use them for
+	- These things are usually set by kernel variables or startup parameters (for Erlang VM). You have a very comprehensive list of those in Inaka's Blog
+	-> Now let's bet again, with all those tweaks, what do we get?
+17. S1: Results
+	- N improved 4x
+	- but ART is EVEN WORST!
+	->
+...
+24. S2.1: Conn Tweaks Code
+	-> Let's see the resulting system architecture after those changes
+25. S2.1: Arch
+	-> Ok, did we improve anything with it?
+...
+30. S2.2: gen_event Code
+	-> Let's see the resulting system architecture after those changes
+31. S2.2: Arch
+	-> Ok, did we improve anything with it?
+...
+38. S2.3: gen_server Code
+	-> We didn't do any architecture changes this time, so let's just jump to the results
+...
+41. S2.4: supervisors Code
