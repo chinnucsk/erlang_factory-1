@@ -64,7 +64,7 @@ init([]) ->
     [{list_to_atom("user-manager-" ++
                      integer_to_list(I)),
       $\colorbox{yellow}{\texttt{\{user\_mgr, start\_link, [I]\}}}$,
-      permanent, brutal_kill, supervisor,
+      permanent, brutal_kill, $\colorbox{yellow}{\texttt{supervisor}}$,
       [user_mgr]}
      || I <- $\colorbox{yellow}{\texttt{lists:seq(1, ?MANAGERS)}}$],
   {ok, {{one_for_one, 5, 10}, Managers}}.
@@ -91,14 +91,16 @@ mochiweb_http:start(
 \begin{lstlisting}[frame=single]
 -define(REDIS_CONNECTIONS, 200).
 -record(state, {redis :: $\colorbox{yellow}{\texttt{[pid()]}}$}).
-$\large \ldots$
-Redis =
-  lists:map(
-    fun(_) ->
-      {ok, Conn} = erldis_client:start_link()
-      Conn
-    end, $\colorbox{yellow}{\texttt{lists:seq(1, ?REDIS\_CONNECTIONS)}}$),
-{ok, #state{redis = Redis}}.
+$\ldots$
+init([]) ->
+  $\ldots$
+  Redis =
+    lists:map(
+      fun(_) ->
+        {ok, Conn} = erldis_client:start_link()
+        Conn
+      end, $\colorbox{yellow}{\texttt{lists:seq(1, ?REDIS\_CONNECTIONS)}}$),
+  {ok, #state{redis = Redis}}.
 \end{lstlisting}
 }
 
@@ -119,7 +121,7 @@ handle_call(Request, From, State) ->
 \defverbatim[colored]\listener{%
 \begin{lstlisting}[frame=single]
 init([]) ->
-$\large \ldots$
+  $\ldots$
   Listeners =
     [{list_to_atom("client-listener-" ++
                      integer_to_list(I)),
@@ -136,23 +138,23 @@ $\large \ldots$
 EvtMgr =
   match_stream_match:event_manager(MatchId),
 ok =
-  gen_event:add_handler(EvtMgr,
+  gen_event:$\colorbox{yellow}{\texttt{add\_handler}}$(EvtMgr,
     {?MODULE, {MatchId,UserId,Client}}, self()),
 $\colorbox{yellow}{\texttt{MgrRef = erlang:monitor(process, EvtMgr)}}$,
 ClientRef = erlang:monitor(process, Client),
 {reply, ok,
  State#state{matches =
-  [{Client, MatchId, ClientRef, MatchRef}
+  [{Client, MatchId, ClientRef, $\colorbox{yellow}{\texttt{MgrRef}}$}
    | State#state.matches]}}
 \end{lstlisting}
 }
 \defverbatim[colored]\suphandlerinfo{%
 \begin{lstlisting}[frame=single]
-handle_info({'DOWN',Ref,_,Client,_}, State) ->
-$\large \ldots$
+handle_info({$\colorbox{yellow}{\texttt{'DOWN'}}$,$\colorbox{yellow}{\texttt{Ref}}$,_,Client,_}, State) ->
+  $\ldots$
   case $\colorbox{yellow}{\texttt{lists:keytake(Ref, 4, State\#state.matches)}}$ of
     {value, {Client,_,CRef,Ref}, OtherMatches} ->
-      $\large \ldots$
+      $\ldots$
 \end{lstlisting}
 }
 
@@ -163,11 +165,11 @@ start_link(Name, Source) ->
   ok = gen_event:add_handler(
          Source, {?MODULE, Pid}, Pid),
   {ok, Pid}.
-  $\ldots$
+$\ldots$
 init(Repeater) ->
   Ref = erlang:monitor(process, Repeater),
   {ok, #state{mgr = Repeater, ref = Ref}}.
-  $\ldots$
+$\ldots$
 handle_event(Event, State) ->
   gen_event:notify(State#state.mgr, Event),
   {ok, State}.
@@ -191,13 +193,13 @@ handle_call(Request, From, State) ->
 \defverbatim[colored]\hibernate{%
 \begin{lstlisting}[frame=single]
 handle_cast(Event, State) ->
-  $\large \ldots$
+  $\ldots$
   {noreply, State, $\colorbox{yellow}{\texttt{hibernate}}$}.
 
-$\large \ldots$
+$\ldots$
 
 handle_call(Request, _From, State) ->
-  $\large \ldots$
+  $\ldots$
   {reply, Reply, State, $\colorbox{yellow}{\texttt{hibernate}}$}.
 \end{lstlisting}
 }
@@ -207,14 +209,26 @@ handle_call(Request, _From, State) ->
 init(UserId) ->
   {ok, #state{user = UserId}, $\colorbox{yellow}{\texttt{0}}$}.
   
-$\large \ldots$
+$\ldots$
 
 handle_info($\colorbox{yellow}{\texttt{timeout}}$, State) ->
   case match_stream_db:user(State#state.user) of
-  $\large \ldots$
+  $\ldots$
 \end{lstlisting}
 }
 
+\defverbatim[colored]\dispatcher{%
+\begin{lstlisting}[frame=single]
+event_manager(MatchId) ->
+  $\colorbox{yellow}{\texttt{binary\_to\_atom(<<"event\_mgr@", MatchId/binary>>, utf8)}}$.
+
+init(MatchId) ->
+  {ok, EventMgr} =
+    gen_event:start_link(
+      $\colorbox{yellow}{\texttt{\{local, event\_manager(MatchId)\}}}$),
+  $\ldots$
+\end{lstlisting}
+}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \frame{\titlepage} 
@@ -228,8 +242,8 @@ handle_info($\colorbox{yellow}{\texttt{timeout}}$, State) ->
 		\item<+-> I'm an Erlang developer since then
 	\end{itemize}
 \end{frame}
-\begin{frame}{Inaka}
-	
+\begin{frame}{Inaka}~
+	{\Huge TODO: Chad's speach for this}
 \end{frame}
 
 \section{Introduction}
@@ -238,7 +252,7 @@ handle_info($\colorbox{yellow}{\texttt{timeout}}$, State) ->
 	My talk is on the scalability of a \emph{web} project \pause that has an \emph{HTTP API} \pause and a component that keeps clients \emph{connected} to the server for \emph{long periods} of time.\\ ~ \\ \pause
 	It's a design pattern seen in many places:
 	\begin{itemize}
-		\item Chat Applications
+		\item Chat Rooms
 		\item Social Sites
 		\item Sport Sites
 	\end{itemize}
@@ -283,7 +297,6 @@ handle_info($\colorbox{yellow}{\texttt{timeout}}$, State) ->
 		\item<+-> Two-hour-long bursts of connections followed by long periods of inactivity
 		\item<+-> Real-time updates
 	\end{itemize}
-	\onslide<+->Erlang seems to be \textbf{the right fit for this}
 \end{frame}
 
 \subsection{Design}
@@ -384,7 +397,7 @@ handle_info($\colorbox{yellow}{\texttt{timeout}}$, State) ->
 	\begin{description}
 		\item[Test Client]~\\ We create our own test client for TCP connections
 		\item[ApacheBench]~\\ To test API calls
-		\item[entop]~\\ We use it to see what's going on in the server
+		\item[entop]~\\ We use it to check server processes
 	\end{description}
 \end{frame}
 
@@ -398,8 +411,9 @@ handle_info($\colorbox{yellow}{\texttt{timeout}}$, State) ->
 	\textsc{Steps}
 	\begin{itemize}
 		\item Create automated testers
-		\item Start the system on a \emph{clean} machine
-		\item Test repeatedly adjusting the number of connections
+		\item Install and start the system on a \emph{clean} machine
+		\item Run the tests on the server's local network
+		\item Test repeatedly adjusting our parameters to maximize them
 		\item Have a human using the system himself
 	\end{itemize}
 \end{frame}
@@ -409,9 +423,9 @@ handle_info($\colorbox{yellow}{\texttt{timeout}}$, State) ->
 			\includegraphics[top=-1,width=\textwidth]{img/results-1.png}
 		\column{.33\textwidth}
 			\begin{description}
-				\item[N] \textbf{\Large 1000}
-				\item[C] \textbf{\Large 5}
-				\item[ART] \textbf{\Large 26s}
+				\item[N] \textbf{\color{red}\Large 1000}
+				\item[C] \textbf{\color{red}\Large 4}
+				\item[ART] \textbf{\color{red}\Large 26s}
 			\end{description}
 	\end{columns}
 \end{frame}
@@ -426,11 +440,11 @@ handle_info($\colorbox{yellow}{\texttt{timeout}}$, State) ->
 	\pause
 	\textsc{Settings to Tune Up}
 	\begin{itemize}
-		\item<+-> Open files limit
-		\item<+-> TCP connections limit
-		\item<+-> TCP backlog size
-		\item<+-> TCP memory allocation
-		\item<+-> Number of Erlang processes
+		\item Open files limit
+		\item TCP connections limit
+		\item TCP backlog size
+		\item TCP memory allocation
+		\item Number of Erlang processes
 	\end{itemize}
 \end{frame}
 \begin{frame}{Stage 1}{Results}
@@ -439,9 +453,9 @@ handle_info($\colorbox{yellow}{\texttt{timeout}}$, State) ->
 			\includegraphics[top=-1,width=\textwidth]{img/results-2.png}
 		\column{.33\textwidth}
 			\begin{description}
-				\item[N] \textbf{\Large 4000}
-				\item[C] \textbf{\Large 5}
-				\item[ART] \textbf{\Large 35s}
+				\item[N] \textbf{\colorbox{yellow}{\Large 4000}}
+				\item[C] \textbf{\color{red}\Large 4}
+				\item[ART] \textbf{\colorbox{yellow}{\color{red}\Large 35s}}
 			\end{description}
 	\end{columns}
 \end{frame}
@@ -473,7 +487,7 @@ handle_info($\colorbox{yellow}{\texttt{timeout}}$, State) ->
 	\begin{description}
 		\item<+->[Outbound Connections]\ \\
 			\begin{itemize}
-				\item For instance, database connections
+				\item e.g., database connections
 				\item Don't use just one of them
 				\item You may have separated connections for different purposes
 			\end{itemize}
@@ -518,9 +532,9 @@ handle_info($\colorbox{yellow}{\texttt{timeout}}$, State) ->
 			\includegraphics[top=-1,width=\textwidth]{img/results-3-1.png}
 		\column{.33\textwidth}
 			\begin{description}
-				\item[N] \textbf{\Large 8000}
-				\item[C] \textbf{\Large 500}
-				\item[ART] \textbf{\Large 15s}
+				\item[N] \textbf{\colorbox{yellow}{\Large 8000}}
+				\item[C] \textbf{\colorbox{yellow}{\Large 500}}
+				\item[ART] \textbf{\colorbox{yellow}{\color{red}\Large 15s}}
 			\end{description}
 	\end{columns}
 \end{frame}
@@ -571,8 +585,8 @@ handle_info($\colorbox{yellow}{\texttt{timeout}}$, State) ->
 		\column{.33\textwidth}
 			\begin{itemize}
 				\item[N] \textbf{\Large 8000}
-				\item[C] \textbf{\Large 500}
-				\item[ART] \textbf{\Large 8s}
+				\item[C] \textbf{\colorbox{yellow}{\Large 1000}}
+				\item[ART] \textbf{\colorbox{yellow}{\Large 2s}}
 			\end{itemize}
 	\end{columns}
 \end{frame}
@@ -611,19 +625,19 @@ handle_info($\colorbox{yellow}{\texttt{timeout}}$, State) ->
 \end{frame}
 \begin{frame}{Stage 2.3}{Results}
 	\begin{columns}
-		\column{.66\textwidth}
+		\column{.64\textwidth}
 			\includegraphics[top=-1,width=\textwidth]{img/results-1.png}
-		\column{.33\textwidth}
+		\column{.36\textwidth}
 			\begin{description}
-				\item[N] \textbf{\Large 32K}
-				\item[C] \textbf{\Large 2000}
-				\item[ART] \textbf{\Large 1s}
+				\item[N] \textbf{\colorbox{yellow}{\Large 40K}}
+				\item[C] \textbf{\colorbox{yellow}{\Large 5K}}
+				\item[ART] \textbf{\colorbox{yellow}{\Large 25ms}}
 			\end{description}
 	\end{columns}
 \end{frame}
 \begin{frame}{Stage 2.4}{supervisors}
 	\begin{description}
-		\item<+->[Simple One for Ones]\ \\
+		\item<+->[Simple One for One Supervisors]\ \\
 			\begin{itemize}
 				\item Sometimes \texttt{simple\textunderscore one\textunderscore for\textunderscore one} supervisors get \alert{overburdened} because they have too many children
 				\item Use a supervisor hierarchy
@@ -655,8 +669,8 @@ handle_info($\colorbox{yellow}{\texttt{timeout}}$, State) ->
 			\includegraphics[top=-1,width=\textwidth]{img/results-1.png}
 		\column{.33\textwidth}
 			\begin{description}
-				\item[N] \textbf{\Large 64K}
-				\item[C] \textbf{\Large 4000}
+				\item[N] \textbf{\colorbox{yellow}{\Large 50K}}
+				\item[C] \textbf{\colorbox{yellow}{\Large 8K}}
 				\item[ART] \textbf{\Large 25ms}
 			\end{description}
 	\end{columns}
@@ -667,32 +681,34 @@ handle_info($\colorbox{yellow}{\texttt{timeout}}$, State) ->
 	\begin{description}
 		\item<+->[Logging]\ \\
 			\begin{itemize}
-				\item Don't log too much
 				\item Use a good logging system
+				\item Choose carefully what to log
 			\end{itemize}
+	\end{description}
+\end{frame}
+\begin{frame}{Stage 2.5}{Other Processes}
+	\begin{description}
 		\item<+->[Registration]\ \\
 			\begin{itemize}
 				\item Sometimes it's better to register processes instead of keeping track of their pids manually
+				{\Huge TODO: Chad's phrase for this}
 				\item You can always register processes \alert{both} locally and globally
 			\end{itemize}
 	\end{description}
 \end{frame}
 \begin{frame}{Stage 2.5}{Other Processes}
-	\textsc{System Architecture}
-	\begin{center}
-		\includegraphics[height=.75\textheight]{img/running-late.png}
-	\end{center}
+\dispatcher
 \end{frame}
 \begin{frame}{Stage 2.5}{Results}
 	\begin{columns}
-		\column{.66\textwidth}
-			\includegraphics[top=-1,width=\textwidth]{img/results-3-5.png}
-		\column{.33\textwidth}
-			\begin{itemize}
-				\item \textbf{\Large 65536} users
-				\item \textbf{\Large 8192} at a time
-				\item \textbf{\Large 10ms} ART
-			\end{itemize}
+		\column{.64\textwidth}
+			\includegraphics[top=-1,width=\textwidth]{img/results-4.png}
+		\column{.35\textwidth}
+			\begin{description}
+				\item[N] \textbf{\Large 50K}
+				\item[C] \textbf{\Large 8K}
+				\item[ART] \textbf{\colorbox{yellow}{\Large 10ms}}
+			\end{description}
 	\end{columns}
 \end{frame}
 
@@ -711,41 +727,67 @@ handle_info($\colorbox{yellow}{\texttt{timeout}}$, State) ->
 	\end{itemize}
 \end{frame}
 \begin{frame}{Stage 3}{Adding Nodes}
-	\textsc{System Architecture}
-	\begin{center}
-		\includegraphics[height=.75\textheight]{img/running-late.png}
-	\end{center}
+	\begin{columns}
+		\column{.5\textwidth}
+			\begin{center}
+				{\Huge TODO: Draw this!}
+%				\includegraphics[height=.65\textheight]{img/architecture-4.png}
+			\end{center}
+		\column{.5\textwidth}
+			\begin{description}
+				\item[db\_reader]
+					\texttt{gen\_server}. One per node. Processes db read operations
+				\item[db\_writer]
+					\texttt{gen\_server}. One per \alert{system}. Processes db write operations
+			\end{description}
+	\end{columns}
 \end{frame}
 \begin{frame}{Stage 3}{Results}
 	\begin{columns}
-		\column{.66\textwidth}
+		\column{.65\textwidth}
 			\includegraphics[top=-1,width=\textwidth]{img/results-4.png}
-		\column{.33\textwidth}
-			\begin{itemize}
-				\item \textbf{\Large 100K} users
-				\item \textbf{\Large 32768} at a time
-				\item \textbf{\Large 10ms} ART
-			\end{itemize}
+		\column{.34\textwidth}
+			With four nodes in the same machine:
+			\begin{description}
+				\item[N] \textbf{\colorbox{yellow}{\Large 100K}}
+				\item[C] \textbf{\colorbox{yellow}{\Large 32K}}
+				\item[ART] \textbf{\Large 10ms}
+			\end{description}
 	\end{columns}
 \end{frame}
 
 \section{Final Words}
 \subsection{Summary}
 \begin{frame}{Summary}
+	\begin{columns}
+		\column<+->{.29\textwidth}
+			With started with:
+			\begin{description}
+				\item[N] \textbf{\Large 1K}
+				\item[C] \textbf{\Large 4}
+				\item[ART] \textbf{\Large 26s}
+			\end{description}
+		\column<+->{.33\textwidth}
+			We scale up to:
+			\begin{description}
+				\item[N] \textbf{\Large 100K}
+				\item[C] \textbf{\Large 32K}
+				\item[ART] \textbf{\Large 10ms}
+			\end{description}
+		\column<+->{.38\textwidth}
+			Our improvements:
+			\begin{description}
+				\item[N] \textbf{\colorbox{yellow}{100x}}
+				\item[C] \textbf{\colorbox{yellow}{8000x}}
+				\item[ART] \textbf{\colorbox{yellow}{2600x}}
+			\end{description}
+	\end{columns}
+\end{frame}
+\begin{frame}{Summary}
 	\begin{itemize}
 		\item<+-> This is an \alert{iterative} process
-		\item<+-> It worked awesomely for us in both experimental and real-life systems
-		\item<+-> It's no \alert{silver bullet}
-		\item<+-> The list of \emph{Tips and Tricks} grows \alert{constantly} over time
-	\end{itemize}
-\end{frame}
-\subsection{What's next?}
-\begin{frame}{Scaling Topics}{that weren't covered on this presentation}
-	\begin{itemize}
-		\item Managing many nodes
-		\item Choosing databases
-		\item System specific improvements
-		\item Measuring tools
+		\item<+-> It proved itself useful in both experimental and real-life systems
+		\item<+-> It gets improved with every system we scale
 	\end{itemize}
 \end{frame}
 \subsection{Questions}
