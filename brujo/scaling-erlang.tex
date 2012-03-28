@@ -125,7 +125,7 @@ init([]) ->
   Listeners =
     [{list_to_atom("client-listener-" ++
                      integer_to_list(I)),
-      $\colorbox{yellow}{\texttt{{client\_listener, start\_link, [\textbf{I}]}}}$,
+      $\colorbox{yellow}{\texttt{\{client\_listener, start\_link, [\textbf{I}]\}}}$,
       permanent, brutal_kill, worker,
       [client_listener]}
      || I <- $\colorbox{yellow}{\texttt{lists:seq(MinPort, MaxPort)}}$],
@@ -291,7 +291,6 @@ init(MatchId) ->
 		\includegraphics[width=\textwidth]{img/overview-4.png}}
 \end{frame}
 \begin{frame}{Match Stream}{Requirements}
-	\textsc{System Challenges}
 	\begin{itemize}
 		\item<+-> Many concurrent users connecting at the same time
 		\item<+-> Two-hour-long bursts of connections followed by long periods of inactivity
@@ -461,12 +460,6 @@ init(MatchId) ->
 \end{frame}
 
 \subsection{Stage 2: Tune the Code}
-\begin{frame}{Stage 2}{Improving Match Stream}
-	\begin{center}
-		\Large We can't blame the machine anymore, we need to improve \alert{our system}
-	\end{center}
-\end{frame}
-
 \subsubsection{TCP Tuning}
 \begin{frame}{Stage 2.1}{Connection Tweaks}
 	\begin{description}
@@ -723,14 +716,27 @@ init(MatchId) ->
 		\item Prepare the system to run in more than one node
 		\item Decide if nodes should be connected or independent
 		\item Decide if nodes should be on the same machine or not
+		\item Determine which processes should be registered globally
 	\end{itemize}
+\end{frame}
+\begin{frame}{Stage 3}{Adding Nodes}
+	\begin{description}
+		\item[For MatchStream]~\\
+			\begin{itemize}
+				\item We leave the \texttt{match} processes registered locally but we connect them using \texttt{pg2}
+				\item We split \texttt{db} in two:
+					\begin{itemize}
+						\item an unique (and therefore) globally registered \texttt{db\_writer}
+						\item a \texttt{db\_reader} per node
+					\end{itemize}
+			\end{itemize}
+	\end{description}
 \end{frame}
 \begin{frame}{Stage 3}{Adding Nodes}
 	\begin{columns}
 		\column{.5\textwidth}
 			\begin{center}
-				{\Huge TODO: Draw this!}
-%				\includegraphics[height=.65\textheight]{img/architecture-4.png}
+				\includegraphics[height=.65\textheight]{img/architecture-4.png}
 			\end{center}
 		\column{.5\textwidth}
 			\begin{description}
