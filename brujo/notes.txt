@@ -54,12 +54,39 @@ S2.1: Results
 	- N improved 2x, but C improved 20x and ART is less than half of what it was before
 	-> Can we improve it further, let's try with gen_events
 ...
-S2.2: gen_event Code
+S2.2: repeater Code
 	-> Let's see the resulting system architecture after those changes
 S2.2: Arch
 	-> Ok, did we improve anything with it?
+S2.2: Results
+	- N stayed the same
+	- but C is 2x
+	- and, most importantly we reduced the ART almost 8x
+	-> Let's tackle another ubiquitous behavior: gen_server
 ...
-S2.3: gen_server Code
+S2.3: init 0 and timeout Code
 	-> We didn't do any architecture changes this time, so let's just jump to the results
+S2.3: Results
+	- N 5x
+	- C 5x
+	- ART almost 100x
+	-> Let's aim now for the supervisors
 ...
-S2.4: supervisors Code
+S2.4: supervisors Code [NOTE: 2 SLIDES]
+	-> Let's see the resulting system architecture after this change
+S2.4: Arch
+	-> Ok, now to the results
+S2.4: Results
+	- N 10K+
+	- C 3K+
+	-> And finally, let's see some other improvements we can make
+S2.5: Logging
+	-> I won't show code on this one, because [TODO]
+...
+S2.5: Code
+	-> We didn't do any architecture changes this time, so let's just jump to the results
+S2.5: Results
+	- Well, we reduce ART to less than its half and we have now an acceptable system
+	-> Let's see if we can add some nodes to it
+
+
