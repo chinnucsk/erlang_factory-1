@@ -5,6 +5,7 @@ Inaka
 Introduction
 	- It's a design pattern we keep seeing everywhere
 	- API is good for integration, Sockets are good for real-time
+	- Use proper names
 	-> And what are we going to do with a sysem like that?
 Scope
 	-> To show you all this process, I created a sample project
@@ -16,6 +17,7 @@ MS: Reqs
 	-> Well, let's start by designing it
 MS: Design
 	[ Show each element ]
+	- REMEMBER: This is BASED on real-life systems
 	-> Let's see how it looks in terms of Erlang processes
 MS: Architecture
 	- This is a general view
@@ -28,10 +30,12 @@ Lesson
 	- Turns out that…
 	-> So, let's see how much can our system scale, right?
 Measures
+	- We needed to do a little trick with ART. Since the only full roundtrip from to client to the server and then to the client again is the first event (the one that tells the client the current match status) we decided to measure that one. And you may notice that one is not a regular event since it's just for one particular client. That means it doesn't need to do ALL the roundtrip (i.e. it doesn't need to go through the match event dispatcher, the user process, etc.). For our measure to be more meaningful, we decided to send that event through the match channels (for every other client, it gets filtered at gen_event level), but for that particular client it is sent to the user process and then to the client. So, it's not exactly ART, but is an accurate measure of the same thing in the sense that if gives us high values, we know that something is not quite right, but most importantly, if it gives us low values, we know for sure that our system has low ART.
 	-> To get those measures, we will use these tools (and some others)
 Tools
 	-> Great! We have our tools, we have our target… let's get started, shall we?
 S0: Baseline
+	- Establishing a Baseline
 	- Note: we want to test it in its local network to prevent the network itself to intervene in our mesurements, but since we're using a local network we know we should aim for better values than the ones we need
 	-> Now, so we test the system… and what do we find? Millions of users? Hundreds of Thousands of users? Well, actually…
 S0: Results
@@ -88,5 +92,21 @@ S2.5: Code
 S2.5: Results
 	- Well, we reduce ART to less than its half and we have now an acceptable system
 	-> Let's see if we can add some nodes to it
-
-
+S3: Goals & Steps
+	-> In our case…
+S3: For MS
+	-> Let's see our final architecture
+S3: Arch
+	-> So, now let's see what we need to do to get to our desired goals
+S3: Results
+	- We wanted to reach 100K users
+	- Our system is really tuned up
+	- So, we just need four connected nodes running in the same server
+	- We only just scratched the surface of what we can achieve:
+		- We tested in one machine
+		- We didn't try more nodes
+	-> We did it, let's summarize this process a little bit
+Summary 1
+	- And we did all that with several tiny adjustments
+	- We didn't need to redesign any big part of the system (maybe just the db split up was big, but just that one)
+	-> So, what else do we know?

@@ -229,6 +229,29 @@ init(MatchId) ->
   $\ldots$
 \end{lstlisting}
 }
+
+\defverbatim[colored]\tcpsample{%
+\begin{lstlisting}[language=bash,basicstyle=\ttfamily\scriptsize]
+> telnet <server> <port>    |2011-09-13 13:48:51: goal:
+...                         |  player: Luna (7)
+Welcome to Match Stream.    |  team: <<"tig">>
+...                         |
+V:2:elbrujohalcon           |2011-09-13 13:49:03: penalty:
+2011-09-13 13:48:48: status:|  player: Martinez (6)
+  home: <<"elp">>           |  team: <<"tig">>
+  home_players:             |
+     Albil (25)             |2011-09-13 13:49:04: card:
+     ...                    |  player: Albil (25)
+  home_score: 0             |  card: red
+  visit: <<"tig">>          |  team: <<"elp">>
+  visit_players:            |
+     ..                     |2011-09-13 13:49:05: substitution:
+  visit_score: 0            |  player_out: Fernandez (18)
+  period: first             |  team: <<"elp">>
+                            |  player_in: Silva (21)
+\end{lstlisting}
+}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \frame{\titlepage} 
@@ -242,8 +265,12 @@ init(MatchId) ->
 		\item<+-> I'm an Erlang developer since then
 	\end{itemize}
 \end{frame}
-\begin{frame}{Inaka}~
-	{\Huge TODO: Chad's speach for this}
+\begin{frame}{Inaka}
+	\begin{itemize}
+		\item We're based in Argentina
+		\item We started in 2010 %TODO: Check with Chad
+		\item We build iOS applications with Erlang servers
+	\end{itemize}
 \end{frame}
 
 \section{Introduction}
@@ -301,6 +328,9 @@ init(MatchId) ->
 \subsection{Design}
 \begin{frame}{Match Stream}{General Design}
 	\includegraphics[width=\textwidth]{img/MatchStream.png}
+\end{frame}
+\begin{frame}{Match Stream}{Sample}
+	\tcpsample
 \end{frame}
 \begin{frame}[t]{Match Stream}{Architecture}
 	\begin{center}
@@ -388,8 +418,8 @@ init(MatchId) ->
 \begin{frame}{Measures}
 	\begin{description}
 		\item[N] \emph{Connections}. Number of connections the server can handle
-		\item[C] \emph{Concurrency}. Number of multiple connections starting at a time
-		\item[ART] \emph{Average Response Time}. How much does it take for the server to send an event
+		\item[C] \emph{Concurrency}. Number of connections starting at a time
+		\item[ART] \emph{Average Response Time}. How much time it takes for the server to send an event
 	\end{description}
 \end{frame}
 \begin{frame}{Tools}
@@ -466,7 +496,7 @@ init(MatchId) ->
 		\item<+->[Backlog]\ \\
 			\begin{itemize}
 				\item Allow more concurrent connections
-				\item Don't forget TCP tuning your HTTP server
+				\item Don't forget to TCP tune your HTTP server
 			\end{itemize}
 	\end{description}
 \end{frame}
@@ -482,7 +512,7 @@ init(MatchId) ->
 			\begin{itemize}
 				\item e.g., database connections
 				\item Don't use just one of them
-				\item You may have separated connections for different purposes
+				\item You may have separate connections for different purposes
 			\end{itemize}
 	\end{description}
 \end{frame}
@@ -538,6 +568,7 @@ init(MatchId) ->
 		\item<+->[sup\textunderscore handler]\ \\
 			\begin{itemize}
 				\item Don't use it
+				\item It exponentially increases the number of \texttt{'EXIT'} messages sent to the subscribers because it notifies anybody of any process termination
 				\item Monitor the processes instead
 			\end{itemize}
 	\end{description}
