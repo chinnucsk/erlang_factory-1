@@ -167,8 +167,7 @@ start_link(Name, Source) ->
   {ok, Pid}.
 $\ldots$
 init(Repeater) ->
-  Ref = erlang:monitor(process, Repeater),
-  {ok, #state{mgr = Repeater, ref = Ref}}.
+  {ok, #state{mgr = Repeater}}.
 $\ldots$
 handle_event(Event, State) ->
   gen_event:notify(State#state.mgr, Event),
@@ -270,6 +269,7 @@ V:2:elbrujohalcon           |2011-09-13 13:49:03: penalty:
 		\item We're based in Argentina
 		\item We started in 2010 %TODO: Check with Chad
 		\item We build iOS applications with Erlang servers
+		%%TODO: Add things here
 	\end{itemize}
 \end{frame}
 
@@ -484,7 +484,7 @@ V:2:elbrujohalcon           |2011-09-13 13:49:03: penalty:
 			\begin{description}
 				\item[N] \textbf{\colorbox{yellow}{\Large 4000}}
 				\item[C] \textbf{\color{red}\Large 4}
-				\item[ART] \textbf{\colorbox{yellow}{\color{red}\Large 35s}}
+				\item[ART] \textbf{\colorbox{yellow}{\color{red}\Large 31s}}
 			\end{description}
 	\end{columns}
 \end{frame}
@@ -495,10 +495,11 @@ V:2:elbrujohalcon           |2011-09-13 13:49:03: penalty:
 	\begin{description}
 		\item<+->[Backlog]\ \\
 			\begin{itemize}
-				\item Allow more concurrent connections
+				\item It defaults to 5, we should increase it
 				\item Don't forget to TCP tune your HTTP server
 			\end{itemize}
 	\end{description}
+	\begin{aquote}{Erlang Docs}The backlog value defines the maximum length that the queue of pending connections may grow to.\end{aquote}
 \end{frame}
 \begin{frame}{Stage 2.1}{Connection Tweaks}
 	\begin{description}
@@ -581,8 +582,9 @@ V:2:elbrujohalcon           |2011-09-13 13:49:03: penalty:
 	\begin{description}
 		\item<+->[Long Delivery Queues]\ \\
 			\begin{itemize}
+				\item The more subscribers a gen\_event has, the longer it takes for it to process a notification
 				\item Distribute the work
-				\item Use \emph{repeaters}
+				\item Use gen\_event \emph{repeaters}
 			\end{itemize}
 	\end{description}
 \end{frame}
@@ -616,7 +618,7 @@ V:2:elbrujohalcon           |2011-09-13 13:49:03: penalty:
 \end{frame}
 \begin{frame}{Stage 2.3}{gen\textunderscore server}
 	\begin{description}
-		\item<+->[Call Timeouts]\ \\
+		\item<+->[Queued Calls]\ \\
 			Remember \texttt{gen\textunderscore server:reply/2}
 	\end{description}
 \end{frame}

@@ -1,7 +1,7 @@
 Hello World!
 	-> After a year at Novamens, I moved to Inaka where I work since almost 2 years ago
 Inaka
-	-> So, what are we going to talk about today?
+	-> So, let's move on to today's talk
 Introduction
 	- It's a design pattern we keep seeing everywhere
 	- API is good for integration, Sockets are good for real-time
@@ -18,13 +18,14 @@ MS: Reqs
 MS: Design
 	[ Show each element ]
 	- REMEMBER: This is BASED on real-life systems
+	-> Let's see how it looks like when it's running
+MS: Sample
 	-> Let's see how it looks in terms of Erlang processes
 MS: Architecture
 	- This is a general view
 	- A regular Erlang application
 	-> Let's see each component in deeper detail
 MS: Components
-	- I'm assuming here, you're all familiar with application and main supervisor process so I'll just skip those
 	-> Great! A good design, we used Erlang, we used OTP… what can possibly go wrong, right?
 Lesson
 	- Turns out that…
