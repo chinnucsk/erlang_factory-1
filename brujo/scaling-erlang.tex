@@ -1,4 +1,6 @@
-\documentclass[utf8]{beamer}
+\documentclass[utf8,hyperref={colorlinks=true}]{beamer}
+\definecolor{links}{HTML}{2A1B81}
+\hypersetup{colorlinks,linkcolor=,urlcolor=links}
 \mode<presentation>
 \usepackage{listings}
 \usepackage{helvet}
@@ -267,9 +269,13 @@ V:2:elbrujohalcon           |2011-09-13 13:49:03: penalty:
 \begin{frame}{Inaka}
 	\begin{itemize}
 		\item We're based in Argentina
-		\item We started in 2010 %TODO: Check with Chad
-		\item We build iOS applications with Erlang servers
-		%%TODO: Add things here
+		\item We do Erlang consulting
+		\item We often build end-to-end applications with
+			\begin{itemize}
+				\item Erlang backends
+				\item iOS clients
+				\item Ruby admin tools
+			\end{itemize}
 	\end{itemize}
 \end{frame}
 
@@ -833,6 +839,25 @@ V:2:elbrujohalcon           |2011-09-13 13:49:03: penalty:
 	\begin{center}
 		\includegraphics[width=\textwidth]{img/theriddler.jpg}
 	\end{center}
+\end{frame}
+\begin{frame}{Resources}
+	\begin{description}
+		\item[About me]~\\
+			\begin{itemize}
+				\item I'm \textbf{\href{http://twitter.com/elbrujohalcon}{@elbrujohalcon}} at Twitter
+				\item I'm \href{http://github.com/elbrujohalcon}{elbrujohalcon} at Github
+			\end{itemize}
+		\item[About Inaka]~\\
+			\begin{itemize}
+				\item Check our website (soon :P): \href{http://inakanetworks.com}{http://inaka.net}
+				\item And our Blog that's on the same site
+			\end{itemize}
+		\item[About MatchStream]~\\
+			\begin{itemize}
+				\item The project is on Github: \href{http://github.com/inaka/match\_stream}{http://github.com/inaka/match\_stream}
+				\item This talk, too: \href{http://github.com/inaka/erlang\_factory/brujo}{http://github.com/inaka/erlang\_factory/brujo}
+			\end{itemize}
+	\end{description}
 \end{frame}
 
 \appendix
